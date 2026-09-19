@@ -32,6 +32,7 @@
   button:hover{filter:brightness(1.25)}
   button.live{background:var(--live); color:#20140a; border-color:var(--live); font-weight:700}
   button.verifica{background:var(--accent); color:#06121f; border-color:var(--accent); font-weight:600}
+  #attivoOra{display:inline-block; margin-left:10px; color:var(--live); font-weight:700}
   input[type=text]{width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line);
     border-radius:8px; padding:12px 13px; font-size:15px}
   input[type=text]:focus{outline:none; border-color:var(--accent)}
@@ -54,6 +55,8 @@
   <div style="margin-top:10px">
     <button onclick="aggiorna()">Aggiorna</button>
     <button class="verifica" onclick="apriStato()">Apri in una scheda</button>
+    <button class="live" onclick="chiEAttivoOra()">Chi &egrave; deviato ora?</button>
+    <span id="attivoOra"></span>
   </div>
   <div class="nota">Questa &egrave; una lettura vera del telefono, non una copia locale. Se il riquadro resta bianco, usa il pulsante blu.</div>
 </div>
@@ -122,6 +125,36 @@ function vai(url){ canale.src = url; }
 function dimmi(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
 function aggiorna(){ frame.src = STATO + "?_=" + Date.now(); }
 function apriStato(){ window.open(STATO + "?_=" + Date.now(), "_blank"); }
+
+async function chiEAttivoOra(){
+  const esito = document.getElementById("attivoOra");
+  esito.textContent = "Controllo...";
+  try {
+    const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
+    if(!risposta.ok) throw new Error();
+    const dati = {};
+    (await risposta.text()).trim().split(";").forEach(parte => {
+      const i = parte.indexOf("=");
+      if(i > 0) dati[parte.slice(0, i).trim().toUpperCase()] = parte.slice(i + 1).trim();
+    });
+
+    const p = Object.fromEntries(new Intl.DateTimeFormat("it-IT", {
+      timeZone:"Europe/Rome", weekday:"short", hour:"2-digit", hourCycle:"h23"
+    }).formatToParts(new Date()).map(x => [x.type, x.value]));
+    const ora = Number(p.hour);
+    const we = p.weekday.toLowerCase().startsWith("sab") || p.weekday.toLowerCase().startsWith("dom");
+    let chiave;
+    if(we){
+      chiave = ora >= 20 || ora < 8 ? "WE_NOTTE" : ora < 14 ? "WE_MATTINA" : "WE_POMERIGGIO";
+    } else {
+      chiave = ora >= 22 || ora < 8 ? "NOTTE" : ora < 14 ? "MATTINA" : ora < 16 ? "POMERIGGIO" : "SERA";
+    }
+    if(!dati[chiave]) throw new Error();
+    esito.textContent = "Adesso: " + dati[chiave];
+  } catch(e) {
+    esito.textContent = "Verifica non riuscita";
+  }
+}
 
 function imposta(fasciaKey, nome, subito){
   const numero = PERSONE[nome];
