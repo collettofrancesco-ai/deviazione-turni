@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turni</title>
+<style>
+  :root{
+    --bg:#11161c; --panel:#1a222b; --panel2:#212b36; --line:#2d3947;
+    --txt:#e8eef5; --dim:#8fa1b5; --accent:#4da3ff; --live:#ff8c42; --ok:#3ecf8e; --warn:#ffb340;
+  }
+  *{box-sizing:border-box}
+  body{margin:0 auto; background:var(--bg); color:var(--txt);
+    font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:22px; max-width:1000px}
+  h1{font-size:19px; margin:0 0 4px; letter-spacing:.3px}
+  .sub{color:var(--dim); font-size:13px; margin-bottom:18px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px}
+  .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--dim); margin-bottom:11px}
+  iframe{width:100%; height:120px; border:1px solid var(--line); border-radius:8px; background:#fff}
+  .gruppo{font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--accent);
+    margin:14px 0 4px; padding-top:12px; border-top:1px solid var(--line)}
+  .gruppo:first-child{margin-top:0; padding-top:0; border-top:none}
+  .row{display:flex; align-items:center; gap:9px; padding:10px 0; border-bottom:1px solid var(--line); flex-wrap:wrap}
+  .row:last-child{border-bottom:none}
+  .fascia{width:160px; font-weight:600; font-size:13px}
+  .fascia small{display:block; font-weight:400; color:var(--dim); font-size:11px}
+  select{flex:1; min-width:150px; background:var(--panel2); color:var(--txt); border:1px solid var(--line);
+    border-radius:8px; padding:9px 10px; font-size:14px}
+  button{background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:8px;
+    padding:9px 14px; font-size:13.5px; font-weight:500; cursor:pointer; white-space:nowrap}
+  button:hover{filter:brightness(1.25)}
+  button.live{background:var(--live); color:#20140a; border-color:var(--live); font-weight:700}
+  button.verifica{background:var(--accent); color:#06121f; border-color:var(--accent); font-weight:600}
+  input[type=text]{width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line);
+    border-radius:8px; padding:12px 13px; font-size:15px}
+  input[type=text]:focus{outline:none; border-color:var(--accent)}
+  .hint{color:var(--dim); font-size:12px; margin-top:8px}
+  .msg{margin-top:10px; font-size:13px; min-height:19px}
+  .msg.ok{color:var(--ok)} .msg.err{color:var(--warn)} .msg.live{color:var(--live)}
+  .nota{color:var(--dim); font-size:12px; margin-top:12px; line-height:1.6}
+  .foot{color:var(--dim); font-size:11.5px; text-align:center; margin-top:22px; line-height:1.7}
+  @media (max-width:640px){ .fascia{width:100%} }
+</style>
+</head>
+<body>
+
+<h1>Deviazione chiamate</h1>
+<div class="sub">Helpdesk &middot; comandi e verifica via MacroDroid cloud &mdash; funziona da qualsiasi rete</div>
+
+<div class="card">
+  <div class="lbl">Situazione reale sul telefono</div>
+  <iframe id="stato" src="about:blank"></iframe>
+  <div style="margin-top:10px">
+    <button onclick="aggiorna()">Aggiorna</button>
+    <button class="verifica" onclick="apriStato()">Apri in una scheda</button>
+  </div>
+  <div class="nota">Questa &egrave; una lettura vera del telefono, non una copia locale. Se il riquadro resta bianco, usa il pulsante blu.</div>
+</div>
+
+<div class="card">
+  <div class="lbl">Comando rapido</div>
+  <input type="text" id="cmd" placeholder="es. cambia sera con Vincenzo &mdash; oppure: weekend pomeriggio Marco" autocomplete="off">
+  <div class="hint">Fascia + nome, in qualsiasi ordine. Per il fine settimana premetti <b>weekend</b>. Aggiungi <b>adesso</b> per deviare all'istante.</div>
+  <div class="msg" id="msg"></div>
+</div>
+
+<div class="card">
+  <div class="lbl">Imposta manualmente</div>
+  <div id="griglia"></div>
+  <div class="nota">
+    <b>Imposta</b> registra la persona: la deviazione parte al prossimo orario della fascia.<br>
+    <b>Attiva ora</b> registra <i>e</i> devia subito, scavalcando l'orario.
+  </div>
+</div>
+
+<div class="foot">
+  I comandi passano dal servizio cloud di MacroDroid: servono internet su questo computer e sul telefono.<br>
+  File locale &mdash; tieni privato questo file, gli indirizzi che contiene comandano le deviazioni.
+</div>
+
+<iframe id="canale" style="display:none" title="canale"></iframe>
+
+<script>
+const ID    = "14510559-534a-4512-9e6d-8af51cc129f8";
+const CLOUD = "https://trigger.macrodroid.com/" + ID;
+const STATO = "https://ask.macrodroid.com/" + ID + "/stato_turni";
+
+const PERSONE = {
+  "Alessandro": "**21*+393935708390#",
+  "Ambra":      "**21*+393381452627#",
+  "Davide":     "**21*+393348296731#",
+  "Francesco":  "**21*+393271691012#",
+  "Ignazio":    "**21*+393294369414#",
+  "Marco":      "**21*+393661021506#",
+  "Mariangela": "**21*+393209792520#",
+  "Marilena":   "**21*+393925036146#",
+  "Nestore":    "**21*+393317419838#",
+  "Roberta":    "**21*+393928412557#",
+  "Roberto":    "**21*+393935431932#",
+  "Vincenzo":   "**21*+393282645438#"
+};
+
+const FASCE = [
+  { key:"mattina",    gruppo:"Lunedi - Venerdi", label:"Mattina",    orario:"08:00-14:00", alias:["mattina","mattino"] },
+  { key:"pomeriggio", gruppo:"Lunedi - Venerdi", label:"Pomeriggio", orario:"14:00-16:00", alias:["pomeriggio","pome"] },
+  { key:"sera",       gruppo:"Lunedi - Venerdi", label:"Sera",       orario:"16:00-22:00", alias:["sera","serale"] },
+  { key:"notte",      gruppo:"Lunedi - Venerdi", label:"Notte",      orario:"22:00-08:00", alias:["notte","notturno"] },
+  { key:"weekend",    gruppo:"Sabato e Domenica", label:"Weekend mattina",    orario:"08:00-14:00", alias:[] },
+  { key:"we_pom",     gruppo:"Sabato e Domenica", label:"Weekend pomeriggio", orario:"14:00-20:00", alias:[] },
+  { key:"we_notte",   gruppo:"Sabato e Domenica", label:"Weekend notte",      orario:"20:00-08:00", alias:[] }
+];
+
+const ORA = ["adesso","subito","ora","immediatamente"];
+const WE  = ["weekend","week-end","sabato","domenica","festivo","festivi"];
+
+const canale = document.getElementById("canale");
+const frame  = document.getElementById("stato");
+const msg    = document.getElementById("msg");
+
+function vai(url){ canale.src = url; }
+function dimmi(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
+function aggiorna(){ frame.src = STATO + "?_=" + Date.now(); }
+function apriStato(){ window.open(STATO + "?_=" + Date.now(), "_blank"); }
+
+function imposta(fasciaKey, nome, subito){
+  const numero = PERSONE[nome];
+  const f = FASCE.find(x => x.key === fasciaKey);
+  if(!numero || !f){ dimmi("Dato non valido", "err"); return; }
+
+  let url = CLOUD + "/turni"
+          + "?op_"   + f.key + "=" + encodeURIComponent(numero)
+          + "&nome_" + f.key + "=" + encodeURIComponent(nome);
+  if(subito) url += "&dial_now=" + encodeURIComponent(numero);
+  vai(url);
+
+  if(subito){
+    setTimeout(() => vai(CLOUD + "/devia"), 1600);
+    dimmi(f.label + " → " + nome + " · deviazione attivata adesso", "live");
+    setTimeout(aggiorna, 3600);
+  } else {
+    dimmi(f.label + " → " + nome + " · attiva dal prossimo orario (" + f.orario + ")", "ok");
+    setTimeout(aggiorna, 2000);
+  }
+}
+
+const griglia = document.getElementById("griglia");
+let gruppoCorrente = null;
+FASCE.forEach(f => {
+  if(f.gruppo !== gruppoCorrente){
+    gruppoCorrente = f.gruppo;
+    const g = document.createElement("div");
+    g.className = "gruppo";
+    g.textContent = f.gruppo;
+    griglia.append(g);
+  }
+
+  const row = document.createElement("div");
+  row.className = "row";
+
+  const lab = document.createElement("div");
+  lab.className = "fascia";
+  lab.innerHTML = f.label + "<small>" + f.orario + "</small>";
+
+  const sel = document.createElement("select");
+  sel.innerHTML = '<option value="">&mdash; scegli &mdash;</option>'
+    + Object.keys(PERSONE).map(n => '<option>' + n + '</option>').join("");
+
+  const b1 = document.createElement("button");
+  b1.textContent = "Imposta";
+  b1.onclick = () => sel.value ? imposta(f.key, sel.value, false)
+                               : dimmi("Scegli prima una persona per " + f.label.toLowerCase(), "err");
+
+  const b2 = document.createElement("button");
+  b2.className = "live";
+  b2.textContent = "Attiva ora";
+  b2.onclick = () => sel.value ? imposta(f.key, sel.value, true)
+                               : dimmi("Scegli prima una persona per " + f.label.toLowerCase(), "err");
+
+  row.append(lab, sel, b1, b2);
+  griglia.append(row);
+});
+
+function normalizza(s){
+  return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")
+          .replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+}
+
+function interpreta(testo){
+  const parole = normalizza(testo).split(" ");
+  let weekend = false, base = null, nome = null, subito = false;
+
+  for(const p of parole){
+    if(ORA.includes(p)) subito = true;
+    if(WE.includes(p)){ weekend = true; continue; }
+    if(!base){
+      if(["mattina","mattino"].includes(p)){ base = "mattina"; continue; }
+      if(["pomeriggio","pome"].includes(p)){ base = "pomeriggio"; continue; }
+      if(["sera","serale"].includes(p)){ base = "sera"; continue; }
+      if(["notte","notturno"].includes(p)){ base = "notte"; continue; }
+    }
+    if(!nome){
+      const n = Object.keys(PERSONE).find(x => normalizza(x) === p);
+      if(n) nome = n;
+    }
+  }
+
+  let fascia = null;
+  if(weekend){
+    if(base === "mattina") fascia = "weekend";
+    else if(base === "pomeriggio" || base === "sera") fascia = "we_pom";
+    else if(base === "notte") fascia = "we_notte";
+    else fascia = "weekend";
+  } else if(base){
+    fascia = base;
+  }
+
+  return { fascia, nome, subito };
+}
+
+document.getElementById("cmd").addEventListener("keydown", e => {
+  if(e.key !== "Enter") return;
+  if(!e.target.value.trim()) return;
+  const { fascia, nome, subito } = interpreta(e.target.value);
+  if(!fascia && !nome){ dimmi("Non ho capito né la fascia né il nome", "err"); return; }
+  if(!fascia){ dimmi("Manca la fascia (mattina, pomeriggio, sera, notte; con 'weekend' davanti per il fine settimana)", "err"); return; }
+  if(!nome){ dimmi("Manca il nome, o non è in rubrica", "err"); return; }
+  imposta(fascia, nome, subito);
+  e.target.value = "";
+});
+
+aggiorna();
+</script>
+
+</body>
+</html>
