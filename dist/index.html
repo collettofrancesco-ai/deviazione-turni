@@ -32,7 +32,8 @@
   button:hover{filter:brightness(1.25)}
   button.live{background:var(--live); color:#20140a; border-color:var(--live); font-weight:700}
   button.verifica{background:var(--accent); color:#06121f; border-color:var(--accent); font-weight:600}
-  #attivoOra{display:inline-block; margin-left:10px; color:var(--live); font-weight:700}
+  #attivoOra{display:inline-flex; align-items:center; min-height:39px; margin-left:10px; padding:8px 12px;
+    color:#20140a; background:var(--live); border-radius:8px; font-size:16px; font-weight:800}
   input[type=text]{width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line);
     border-radius:8px; padding:12px 13px; font-size:15px}
   input[type=text]:focus{outline:none; border-color:var(--accent)}
@@ -56,7 +57,7 @@
     <button onclick="aggiorna()">Aggiorna</button>
     <button class="verifica" onclick="apriStato()">Apri in una scheda</button>
     <button class="live" onclick="chiEAttivoOra()">Chi &egrave; deviato ora?</button>
-    <span id="attivoOra"></span>
+    <span id="attivoOra" role="status" aria-live="polite">Adesso: controllo...</span>
   </div>
   <div class="nota">Questa &egrave; una lettura vera del telefono, non una copia locale. Se il riquadro resta bianco, usa il pulsante blu.</div>
   <div class="row" style="margin-top:12px">
@@ -142,13 +143,19 @@ function deviaImmediatamente(){
   vai(CLOUD + "/turni?dial_now=" + encodeURIComponent(PERSONE[nome]));
   setTimeout(() => vai(CLOUD + "/devia"), 1600);
   dimmi("Deviazione immediata avviata su " + nome, "live");
+  mostraAttivo(nome);
+  setTimeout(() => { aggiorna(); chiEAttivoOra(); }, 3600);
+}
+
+function mostraAttivo(nome){
   document.getElementById("attivoOra").textContent = "Adesso: " + nome;
-  setTimeout(aggiorna, 3600);
+  localStorage.setItem("ultimoOperatoreVerificato", nome);
 }
 
 async function chiEAttivoOra(){
   const esito = document.getElementById("attivoOra");
-  esito.textContent = "Controllo...";
+  const ultimo = localStorage.getItem("ultimoOperatoreVerificato");
+  if(!ultimo) esito.textContent = "Adesso: controllo...";
   try {
     const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
     if(!risposta.ok) throw new Error();
@@ -170,9 +177,9 @@ async function chiEAttivoOra(){
       chiave = ora >= 22 || ora < 8 ? "NOTTE" : ora < 14 ? "MATTINA" : ora < 16 ? "POMERIGGIO" : "SERA";
     }
     if(!dati[chiave]) throw new Error();
-    esito.textContent = "Adesso: " + dati[chiave];
+    mostraAttivo(dati[chiave]);
   } catch(e) {
-    esito.textContent = "Verifica non riuscita";
+    esito.textContent = ultimo ? "Adesso: " + ultimo : "Adesso: verifica non riuscita";
   }
 }
 
@@ -190,7 +197,8 @@ function imposta(fasciaKey, nome, subito){
   if(subito){
     setTimeout(() => vai(CLOUD + "/devia"), 1600);
     dimmi(f.label + " → " + nome + " · deviazione attivata adesso", "live");
-    setTimeout(aggiorna, 3600);
+    mostraAttivo(nome);
+    setTimeout(() => { aggiorna(); chiEAttivoOra(); }, 3600);
   } else {
     dimmi(f.label + " → " + nome + " · attiva dal prossimo orario (" + f.orario + ")", "ok");
     setTimeout(aggiorna, 2000);
@@ -283,6 +291,8 @@ document.getElementById("cmd").addEventListener("keydown", e => {
 });
 
 aggiorna();
+chiEAttivoOra();
+setInterval(() => { aggiorna(); chiEAttivoOra(); }, 60000);
 </script>
 
 </body>
