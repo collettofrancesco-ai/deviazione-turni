@@ -6,18 +6,19 @@
 <title>Turni</title>
 <style>
   :root{
-    --bg:#11161c; --panel:#1a222b; --panel2:#212b36; --line:#2d3947;
-    --txt:#e8eef5; --dim:#8fa1b5; --accent:#4da3ff; --live:#ff8c42; --ok:#3ecf8e; --warn:#ffb340;
+    --bg:#0d1117; --panel:#161b22; --panel2:#21262d; --line:#30363d;
+    --txt:#f0f3f6; --dim:#8b949e; --accent:#58a6ff; --live:#f0883e; --ok:#3fb950; --warn:#d29922;
   }
   *{box-sizing:border-box}
   body{margin:0 auto; background:var(--bg); color:var(--txt);
     font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    padding:22px; max-width:1000px}
-  h1{font-size:19px; margin:0 0 4px; letter-spacing:.3px}
-  .sub{color:var(--dim); font-size:13px; margin-bottom:18px}
-  .card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px}
+    padding:28px 22px 40px; max-width:1000px}
+  h1{font-size:22px; margin:0 0 4px; letter-spacing:0}
+  .sub{color:var(--dim); font-size:13px; margin-bottom:22px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px; margin-bottom:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.14)}
   .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--dim); margin-bottom:11px}
-  iframe{width:100%; height:120px; border:1px solid var(--line); border-radius:8px; background:#fff}
+  iframe{width:100%; height:120px; border:1px solid var(--line); border-radius:6px; background:#fff}
   .gruppo{font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--accent);
     margin:14px 0 4px; padding-top:12px; border-top:1px solid var(--line)}
   .gruppo:first-child{margin-top:0; padding-top:0; border-top:none}
@@ -27,13 +28,15 @@
   .fascia small{display:block; font-weight:400; color:var(--dim); font-size:11px}
   select{flex:1; min-width:150px; background:var(--panel2); color:var(--txt); border:1px solid var(--line);
     border-radius:8px; padding:9px 10px; font-size:14px}
-  button{background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:8px;
+  button{background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px;
     padding:9px 14px; font-size:13.5px; font-weight:500; cursor:pointer; white-space:nowrap}
   button:hover{filter:brightness(1.25)}
   button.live{background:var(--live); color:#20140a; border-color:var(--live); font-weight:700}
   button.verifica{background:var(--accent); color:#06121f; border-color:var(--accent); font-weight:600}
-  #attivoOra{display:inline-flex; align-items:center; min-height:39px; margin-left:10px; padding:8px 12px;
-    color:#20140a; background:var(--live); border-radius:8px; font-size:16px; font-weight:800}
+  .live-banner{display:flex; align-items:center; justify-content:space-between; gap:18px; padding:16px 18px;
+    margin-bottom:14px; background:#252017; border:1px solid #6e4d28; border-radius:7px}
+  .live-label{color:#d6b98f; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.9px}
+  #attivoOra{color:#ff9d57; font-size:23px; font-weight:800; text-align:right}
   input[type=text]{width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line);
     border-radius:8px; padding:12px 13px; font-size:15px}
   input[type=text]:focus{outline:none; border-color:var(--accent)}
@@ -43,6 +46,10 @@
   .nota{color:var(--dim); font-size:12px; margin-top:12px; line-height:1.6}
   .foot{color:var(--dim); font-size:11.5px; text-align:center; margin-top:22px; line-height:1.7}
   .status-actions{display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap}
+  details{margin-top:12px; border-top:1px solid var(--line); padding-top:12px}
+  summary{color:var(--dim); cursor:pointer; font-size:12px; font-weight:600; user-select:none}
+  details iframe{margin-top:10px}
+  .immediate-row{margin-top:16px; padding-top:16px; border-top:1px solid var(--line)}
   @media (max-width:640px){
     body{padding:12px; font-size:14px}
     h1{font-size:21px}
@@ -52,8 +59,9 @@
     .status-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px}
     .status-actions button{width:100%; padding:10px 8px}
     .status-actions button.live{grid-column:1/-1}
-    #attivoOra{grid-column:1/-1; grid-row:1; width:100%; margin:0; justify-content:center;
-      min-height:48px; font-size:18px}
+    .live-banner{display:block; padding:14px; text-align:center}
+    .live-label{display:block; margin-bottom:3px}
+    #attivoOra{display:block; font-size:22px; text-align:center}
     .row{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:13px 0}
     .fascia{grid-column:1/-1; width:100%; font-size:15px}
     .fascia small{font-size:12px; margin-top:1px}
@@ -72,15 +80,20 @@
 
 <div class="card">
   <div class="lbl">Situazione reale sul telefono</div>
-  <iframe id="stato" src="about:blank"></iframe>
+  <div class="live-banner">
+    <span class="live-label">Deviazione attiva</span>
+    <span id="attivoOra" role="status" aria-live="polite">Adesso: controllo...</span>
+  </div>
   <div class="status-actions">
     <button onclick="aggiorna()">Aggiorna</button>
     <button class="verifica" onclick="apriStato()">Apri in una scheda</button>
     <button class="live" onclick="chiEAttivoOra()">Chi &egrave; deviato ora?</button>
-    <span id="attivoOra" role="status" aria-live="polite">Adesso: controllo...</span>
   </div>
-  <div class="nota">Questa &egrave; una lettura vera del telefono, non una copia locale. Se il riquadro resta bianco, usa il pulsante blu.</div>
-  <div class="row immediate-row" style="margin-top:12px">
+  <details>
+    <summary>Mostra configurazione completa</summary>
+    <iframe id="stato" src="about:blank" title="Configurazione reale sul telefono"></iframe>
+  </details>
+  <div class="row immediate-row">
     <div class="fascia">Devia subito</div>
     <select id="operatoreImmediato" aria-label="Operatore per deviazione immediata"></select>
     <button class="live" onclick="deviaImmediatamente()">Devia immediatamente</button>
