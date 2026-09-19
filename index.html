@@ -59,6 +59,11 @@
     <span id="attivoOra"></span>
   </div>
   <div class="nota">Questa &egrave; una lettura vera del telefono, non una copia locale. Se il riquadro resta bianco, usa il pulsante blu.</div>
+  <div class="row" style="margin-top:12px">
+    <div class="fascia">Devia subito</div>
+    <select id="operatoreImmediato" aria-label="Operatore per deviazione immediata"></select>
+    <button class="live" onclick="deviaImmediatamente()">Devia immediatamente</button>
+  </div>
 </div>
 
 <div class="card">
@@ -121,10 +126,25 @@ const canale = document.getElementById("canale");
 const frame  = document.getElementById("stato");
 const msg    = document.getElementById("msg");
 
+const operatoreImmediato = document.getElementById("operatoreImmediato");
+operatoreImmediato.innerHTML = '<option value="">&mdash; scegli operatore &mdash;</option>'
+  + Object.keys(PERSONE).map(n => '<option>' + n + '</option>').join("");
+
 function vai(url){ canale.src = url; }
 function dimmi(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
 function aggiorna(){ frame.src = STATO + "?_=" + Date.now(); }
 function apriStato(){ window.open(STATO + "?_=" + Date.now(), "_blank"); }
+
+function deviaImmediatamente(){
+  const nome = operatoreImmediato.value;
+  if(!nome){ dimmi("Scegli prima un operatore", "err"); return; }
+  if(!confirm("Deviare subito tutte le chiamate su " + nome + "?")) return;
+  vai(CLOUD + "/turni?dial_now=" + encodeURIComponent(PERSONE[nome]));
+  setTimeout(() => vai(CLOUD + "/devia"), 1600);
+  dimmi("Deviazione immediata avviata su " + nome, "live");
+  document.getElementById("attivoOra").textContent = "Adesso: " + nome;
+  setTimeout(aggiorna, 3600);
+}
 
 async function chiEAttivoOra(){
   const esito = document.getElementById("attivoOra");
