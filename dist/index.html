@@ -86,7 +86,7 @@
     <span id="attivoOra" role="status" aria-live="polite">Adesso: controllo...</span>
   </div>
   <div class="status-actions">
-    <button onclick="aggiorna()">Aggiorna</button>
+    <button onclick="chiEAttivoOra(true)">Aggiorna</button>
     <button class="verifica" onclick="apriStato()">Apri in una scheda</button>
   </div>
   <details>
@@ -122,6 +122,7 @@
 const ID    = "14510559-534a-4512-9e6d-8af51cc129f8";
 const CLOUD = "https://trigger.macrodroid.com/" + ID;
 const STATO = "https://ask.macrodroid.com/" + ID + "/stato_turni";
+const VERIFICA_REALE = CLOUD + "/verifica_reale";
 
 const PERSONE = {
   "Alessandro": "**21*+393935708390#",
@@ -171,8 +172,8 @@ function deviaImmediatamente(){
   vai(CLOUD + "/turni?dial_now=" + encodeURIComponent(PERSONE[nome]));
   setTimeout(() => vai(CLOUD + "/devia"), 1600);
   dimmi("Deviazione immediata avviata su " + nome, "live");
-  mostraAttivo(nome);
-  setTimeout(() => { aggiorna(); chiEAttivoOra(); }, 3600);
+  document.getElementById("attivoOra").textContent = "Adesso: verifica in corso...";
+  setTimeout(() => chiEAttivoOra(true), 5000);
 }
 
 function mostraAttivo(nome){
@@ -180,34 +181,26 @@ function mostraAttivo(nome){
   localStorage.setItem("ultimoOperatoreVerificato", nome);
 }
 
-async function chiEAttivoOra(){
+async function chiEAttivoOra(avviaVerifica = true){
   const esito = document.getElementById("attivoOra");
   const ultimo = localStorage.getItem("ultimoOperatoreVerificato");
-  if(!ultimo) esito.textContent = "Adesso: controllo...";
+  esito.textContent = "Adesso: controllo reale...";
   try {
+    if(avviaVerifica){
+      vai(VERIFICA_REALE + "?_=" + Date.now());
+      await new Promise(resolve => setTimeout(resolve, 7000));
+    }
     const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
     if(!risposta.ok) throw new Error();
-    const dati = {};
-    (await risposta.text()).trim().split(";").forEach(parte => {
-      const i = parte.indexOf("=");
-      if(i > 0) dati[parte.slice(0, i).trim().toUpperCase()] = parte.slice(i + 1).trim();
+    const testo = await risposta.text();
+    const trovato = Object.entries(PERSONE).find(([, comando]) => {
+      const numero = comando.replace(/\D/g, "").slice(-10);
+      return testo.replace(/\D/g, "").includes(numero);
     });
-
-    const p = Object.fromEntries(new Intl.DateTimeFormat("it-IT", {
-      timeZone:"Europe/Rome", weekday:"short", hour:"2-digit", hourCycle:"h23"
-    }).formatToParts(new Date()).map(x => [x.type, x.value]));
-    const ora = Number(p.hour);
-    const we = p.weekday.toLowerCase().startsWith("sab") || p.weekday.toLowerCase().startsWith("dom");
-    let chiave;
-    if(we){
-      chiave = ora >= 20 || ora < 8 ? "WE_NOTTE" : ora < 14 ? "WE_MATTINA" : "WE_POMERIGGIO";
-    } else {
-      chiave = ora >= 22 || ora < 8 ? "NOTTE" : ora < 14 ? "MATTINA" : ora < 16 ? "POMERIGGIO" : "SERA";
-    }
-    if(!dati[chiave]) throw new Error();
-    mostraAttivo(dati[chiave]);
+    if(!trovato) throw new Error();
+    mostraAttivo(trovato[0]);
   } catch(e) {
-    esito.textContent = ultimo ? "Adesso: " + ultimo : "Adesso: verifica non riuscita";
+    esito.textContent = ultimo ? "Ultimo verificato: " + ultimo : "Adesso: verifica non riuscita";
   }
 }
 
@@ -225,8 +218,8 @@ function imposta(fasciaKey, nome, subito){
   if(subito){
     setTimeout(() => vai(CLOUD + "/devia"), 1600);
     dimmi(f.label + " → " + nome + " · deviazione attivata adesso", "live");
-    mostraAttivo(nome);
-    setTimeout(() => { aggiorna(); chiEAttivoOra(); }, 3600);
+    document.getElementById("attivoOra").textContent = "Adesso: verifica in corso...";
+    setTimeout(() => chiEAttivoOra(true), 5000);
   } else {
     dimmi(f.label + " → " + nome + " · attiva dal prossimo orario (" + f.orario + ")", "ok");
     setTimeout(aggiorna, 2000);
@@ -319,8 +312,9 @@ document.getElementById("cmd").addEventListener("keydown", e => {
 });
 
 aggiorna();
-chiEAttivoOra();
-setInterval(() => { aggiorna(); chiEAttivoOra(); }, 60000);
+chiEAttivoOra(true);
+setInterval(() => { aggiorna(); chiEAttivoOra(false); }, 60000);
+setInterval(() => chiEAttivoOra(true), 300000);
 </script>
 
 </body>
