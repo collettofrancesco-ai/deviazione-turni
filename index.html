@@ -178,12 +178,10 @@ function deviaImmediatamente(){
 
 function mostraAttivo(nome){
   document.getElementById("attivoOra").textContent = "Adesso: " + nome;
-  localStorage.setItem("ultimoOperatoreVerificato", nome);
 }
 
 async function chiEAttivoOra(avviaVerifica = true){
   const esito = document.getElementById("attivoOra");
-  const ultimo = localStorage.getItem("ultimoOperatoreVerificato");
   esito.textContent = "Adesso: controllo reale...";
   try {
     if(avviaVerifica){
@@ -200,7 +198,7 @@ async function chiEAttivoOra(avviaVerifica = true){
     if(!trovato) throw new Error();
     mostraAttivo(trovato[0]);
   } catch(e) {
-    esito.textContent = ultimo ? "Ultimo verificato: " + ultimo : "Adesso: verifica non riuscita";
+    esito.textContent = "Adesso: verifica non riuscita";
   }
 }
 
@@ -312,9 +310,8 @@ document.getElementById("cmd").addEventListener("keydown", e => {
 });
 
 aggiorna();
-chiEAttivoOra(true);
-setInterval(() => { aggiorna(); chiEAttivoOra(false); }, 60000);
-setInterval(() => chiEAttivoOra(true), 300000);
+document.getElementById("attivoOra").textContent = "Adesso: premi Aggiorna per verificare";
+setInterval(aggiorna, 60000);
 </script>
 
 </body>
