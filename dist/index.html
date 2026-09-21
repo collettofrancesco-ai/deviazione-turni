@@ -186,18 +186,21 @@ async function chiEAttivoOra(avviaVerifica = true){
   try {
     if(avviaVerifica){
       vai(VERIFICA_REALE + "?_=" + Date.now());
-      await new Promise(resolve => setTimeout(resolve, 7000));
+      await new Promise(resolve => setTimeout(resolve, 9000));
     }
-    const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
-    if(!risposta.ok) throw new Error();
-    const testo = await risposta.text();
-    const campoReale = testo.match(/(?:^|;)\s*REALE=([^;\r\n]*)/i);
-    if(!campoReale) throw new Error();
-    const nomeReale = Object.keys(PERSONE).find(
-      nome => nome.toLowerCase() === campoReale[1].trim().toLowerCase()
-    );
-    if(!nomeReale) throw new Error();
-    mostraAttivo(nomeReale);
+    for(let tentativo = 0; tentativo < 5; tentativo++){
+      const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
+      if(risposta.ok){
+        const testo = await risposta.text();
+        const campoReale = testo.match(/(?:^|;)\s*REALE=([^;\r\n]*)/i);
+        const nomeReale = campoReale && Object.keys(PERSONE).find(
+          nome => nome.toLowerCase() === campoReale[1].trim().toLowerCase()
+        );
+        if(nomeReale){ mostraAttivo(nomeReale); return; }
+      }
+      if(tentativo < 4) await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+    throw new Error();
   } catch(e) {
     esito.textContent = "Adesso: verifica non riuscita";
   }
