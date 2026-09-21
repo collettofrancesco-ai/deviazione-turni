@@ -201,6 +201,7 @@ function nonVerificato(motivo){
 
 async function chiEAttivoOra(avviaVerifica = true){
   const esito = document.getElementById("attivoOra");
+  let rispostaIlleggibile = false;
 
   if(avviaVerifica){
     vai(AZZERA + "&_=" + Date.now());
@@ -212,7 +213,7 @@ async function chiEAttivoOra(avviaVerifica = true){
     esito.textContent = "Adesso: controllo\u2026";
   }
 
-  for(let tentativo = 0; tentativo < 7; tentativo++){
+  for(let tentativo = 0; tentativo < 10; tentativo++){
     try {
       const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
       if(risposta.ok){
@@ -228,14 +229,15 @@ async function chiEAttivoOra(avviaVerifica = true){
           );
           if(nomeReale){ mostraAttivo(nomeReale[0], cifreReali); return; }
           if(cifreReali.length === 10){ mostraAttivo("", cifreReali); return; }
-          nonVerificato("risposta illeggibile");
-          return;
+          rispostaIlleggibile = true;
         }
       }
     } catch(e) { /* riprova */ }
     await attendi(3000);
   }
-  nonVerificato("il telefono non ha risposto");
+  nonVerificato(rispostaIlleggibile
+    ? "il telefono ha risposto senza un numero leggibile"
+    : "il telefono non ha risposto");
 }
 
 function imposta(fasciaKey, nome, subito){
