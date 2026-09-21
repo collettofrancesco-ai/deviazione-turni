@@ -191,12 +191,13 @@ async function chiEAttivoOra(avviaVerifica = true){
     const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
     if(!risposta.ok) throw new Error();
     const testo = await risposta.text();
-    const trovato = Object.entries(PERSONE).find(([, comando]) => {
-      const numero = comando.replace(/\D/g, "").slice(-10);
-      return testo.replace(/\D/g, "").includes(numero);
-    });
-    if(!trovato) throw new Error();
-    mostraAttivo(trovato[0]);
+    const campoReale = testo.match(/(?:^|;)\s*REALE=([^;\r\n]*)/i);
+    if(!campoReale) throw new Error();
+    const nomeReale = Object.keys(PERSONE).find(
+      nome => nome.toLowerCase() === campoReale[1].trim().toLowerCase()
+    );
+    if(!nomeReale) throw new Error();
+    mostraAttivo(nomeReale);
   } catch(e) {
     esito.textContent = "Adesso: verifica non riuscita";
   }
