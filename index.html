@@ -176,8 +176,13 @@ function deviaImmediatamente(){
   setTimeout(() => chiEAttivoOra(true), 5000);
 }
 
-function mostraAttivo(nome){
-  document.getElementById("attivoOra").textContent = "Adesso: " + nome;
+function mostraAttivo(nome, numero){
+  const numeroFormattato = numero
+    ? "+39 " + numero.slice(-10, -7) + " " + numero.slice(-7, -4) + " " + numero.slice(-4)
+    : "";
+  document.getElementById("attivoOra").textContent = numeroFormattato
+    ? "Adesso: " + (nome ? nome + " - " : "") + numeroFormattato
+    : "Adesso: " + nome;
 }
 
 async function chiEAttivoOra(avviaVerifica = true){
@@ -193,10 +198,14 @@ async function chiEAttivoOra(avviaVerifica = true){
       if(risposta.ok){
         const testo = await risposta.text();
         const campoReale = testo.match(/(?:^|;)\s*REALE=([^;\r\n]*)/i);
-        const nomeReale = campoReale && Object.keys(PERSONE).find(
-          nome => nome.toLowerCase() === campoReale[1].trim().toLowerCase()
+        const valoreReale = campoReale ? campoReale[1].trim() : "";
+        const cifreReali = valoreReale.replace(/\D/g, "").slice(-10);
+        const nomeReale = Object.entries(PERSONE).find(([nome, comando]) =>
+          nome.toLowerCase() === valoreReale.toLowerCase()
+          || (cifreReali && comando.replace(/\D/g, "").slice(-10) === cifreReali)
         );
-        if(nomeReale){ mostraAttivo(nomeReale); return; }
+        if(nomeReale){ mostraAttivo(nomeReale[0], cifreReali); return; }
+        if(cifreReali.length === 10){ mostraAttivo("", cifreReali); return; }
       }
       if(tentativo < 4) await new Promise(resolve => setTimeout(resolve, 3000));
     }
