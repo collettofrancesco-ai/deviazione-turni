@@ -122,7 +122,8 @@
 const ID    = "14510559-534a-4512-9e6d-8af51cc129f8";
 const CLOUD = "https://trigger.macrodroid.com/" + ID;
 const STATO = "https://ask.macrodroid.com/" + ID + "/stato_turni";
-const VERIFICA_REALE = CLOUD + "/verifica_reale";
+const LEGGI_REALE = CLOUD + "/leggi_reale";
+const AZZERA       = CLOUD + "/turni?rete_esito=ATTESA";
 
 const PERSONE = {
   "Alessandro": "**21*+393935708390#",
@@ -173,46 +174,68 @@ function deviaImmediatamente(){
   setTimeout(() => vai(CLOUD + "/devia"), 1600);
   dimmi("Deviazione immediata avviata su " + nome, "live");
   document.getElementById("attivoOra").textContent = "Adesso: verifica in corso...";
-  setTimeout(() => chiEAttivoOra(true), 5000);
+  setTimeout(() => chiEAttivoOra(true), 8000);
 }
+
+function oraLocale(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+}
+
+const attendi = ms => new Promise(r => setTimeout(r, ms));
 
 function mostraAttivo(nome, numero){
   const numeroFormattato = numero
     ? "+39 " + numero.slice(-10, -7) + " " + numero.slice(-7, -4) + " " + numero.slice(-4)
     : "";
-  document.getElementById("attivoOra").textContent = numeroFormattato
+  const testa = numeroFormattato
     ? "Adesso: " + (nome ? nome + " - " : "") + numeroFormattato
     : "Adesso: " + nome;
+  document.getElementById("attivoOra").textContent = testa + "  \u00b7  letto alle " + oraLocale();
+}
+
+function nonVerificato(motivo){
+  document.getElementById("attivoOra").textContent =
+    "Stato non verificato" + (motivo ? " \u2014 " + motivo : "");
 }
 
 async function chiEAttivoOra(avviaVerifica = true){
   const esito = document.getElementById("attivoOra");
-  esito.textContent = "Adesso: controllo reale...";
-  try {
-    if(avviaVerifica){
-      vai(VERIFICA_REALE + "?_=" + Date.now());
-      await new Promise(resolve => setTimeout(resolve, 9000));
-    }
-    for(let tentativo = 0; tentativo < 5; tentativo++){
+
+  if(avviaVerifica){
+    vai(AZZERA + "&_=" + Date.now());
+    await attendi(1500);
+    esito.textContent = "Adesso: interrogo la rete\u2026";
+    vai(LEGGI_REALE + "?_=" + Date.now());
+    await attendi(14000);
+  } else {
+    esito.textContent = "Adesso: controllo\u2026";
+  }
+
+  for(let tentativo = 0; tentativo < 7; tentativo++){
+    try {
       const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
       if(risposta.ok){
         const testo = await risposta.text();
         const campoReale = testo.match(/(?:^|;)\s*REALE=([^;\r\n]*)/i);
         const valoreReale = campoReale ? campoReale[1].trim() : "";
-        const cifreReali = valoreReale.replace(/\D/g, "").slice(-10);
-        const nomeReale = Object.entries(PERSONE).find(([nome, comando]) =>
-          nome.toLowerCase() === valoreReale.toLowerCase()
-          || (cifreReali && comando.replace(/\D/g, "").slice(-10) === cifreReali)
-        );
-        if(nomeReale){ mostraAttivo(nomeReale[0], cifreReali); return; }
-        if(cifreReali.length === 10){ mostraAttivo("", cifreReali); return; }
+
+        if(valoreReale && valoreReale.toUpperCase() !== "ATTESA"){
+          const cifreReali = valoreReale.replace(/\D/g, "").slice(-10);
+          const nomeReale = Object.entries(PERSONE).find(([nome, comando]) =>
+            nome.toLowerCase() === valoreReale.toLowerCase()
+            || (cifreReali && comando.replace(/\D/g, "").slice(-10) === cifreReali)
+          );
+          if(nomeReale){ mostraAttivo(nomeReale[0], cifreReali); return; }
+          if(cifreReali.length === 10){ mostraAttivo("", cifreReali); return; }
+          nonVerificato("risposta illeggibile");
+          return;
+        }
       }
-      if(tentativo < 4) await new Promise(resolve => setTimeout(resolve, 3000));
-    }
-    throw new Error();
-  } catch(e) {
-    esito.textContent = "Adesso: verifica non riuscita";
+    } catch(e) { /* riprova */ }
+    await attendi(3000);
   }
+  nonVerificato("il telefono non ha risposto");
 }
 
 function imposta(fasciaKey, nome, subito){
@@ -230,7 +253,7 @@ function imposta(fasciaKey, nome, subito){
     setTimeout(() => vai(CLOUD + "/devia"), 1600);
     dimmi(f.label + " → " + nome + " · deviazione attivata adesso", "live");
     document.getElementById("attivoOra").textContent = "Adesso: verifica in corso...";
-    setTimeout(() => chiEAttivoOra(true), 5000);
+    setTimeout(() => chiEAttivoOra(true), 8000);
   } else {
     dimmi(f.label + " → " + nome + " · attiva dal prossimo orario (" + f.orario + ")", "ok");
     setTimeout(aggiorna, 2000);
