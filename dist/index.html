@@ -49,7 +49,11 @@
   .status-actions{display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap}
   details{margin-top:12px; border-top:1px solid var(--line); padding-top:12px}
   summary{color:var(--dim); cursor:pointer; font-size:12px; font-weight:600; user-select:none}
-  details iframe{margin-top:10px}
+  .config{margin-top:10px; border:1px solid var(--line); border-radius:8px; padding:6px 14px 10px; font-size:14px}
+  .cfg-gruppo{font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--dim); margin-top:10px}
+  .cfg-riga{display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--line)}
+  .cfg-riga:last-child{border-bottom:none}
+  .cfg-riga small{color:var(--dim)}
   .immediate-row{margin-top:16px; padding-top:16px; border-top:1px solid var(--line)}
   @media (max-width:640px){
     body{padding:12px; font-size:14px}
@@ -91,7 +95,7 @@
   </div>
   <details>
     <summary>Mostra configurazione completa</summary>
-    <iframe id="stato" src="about:blank" title="Configurazione reale sul telefono"></iframe>
+    <div id="stato" class="config" aria-live="polite">Caricamento…</div>
   </details>
   <div class="row immediate-row">
     <div class="fascia">Devia subito</div>
@@ -162,7 +166,45 @@ operatoreImmediato.innerHTML = '<option value="">&mdash; scegli operatore &mdash
 
 function vai(url){ canale.src = url; }
 function dimmi(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
-function aggiorna(){ frame.src = STATO + "?_=" + Date.now(); }
+const CAMPI = { mattina:"MATTINA", pomeriggio:"POMERIGGIO", notte:"NOTTE",
+                weekend:"WE_MATTINA", we_pom:"WE_POMERIGGIO", we_notte:"WE_NOTTE" };
+
+// Legge la configurazione dal telefono e mostra solo le fasce in uso.
+async function aggiorna(){
+  try {
+    const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
+    if(!risposta.ok) throw new Error();
+    const valori = {};
+    (await risposta.text()).split(";").forEach(pezzo => {
+      const i = pezzo.indexOf("=");
+      if(i > 0) valori[pezzo.slice(0, i).trim().toUpperCase()] = pezzo.slice(i + 1).trim();
+    });
+    frame.textContent = "";
+    let gruppo = null;
+    FASCE.forEach(f => {
+      if(f.gruppo !== gruppo){
+        gruppo = f.gruppo;
+        const g = document.createElement("div");
+        g.className = "cfg-gruppo";
+        g.textContent = f.gruppo;
+        frame.append(g);
+      }
+      const riga = document.createElement("div");
+      riga.className = "cfg-riga";
+      const fascia = document.createElement("span");
+      fascia.textContent = f.label + " ";
+      const ore = document.createElement("small");
+      ore.textContent = f.orario;
+      fascia.append(ore);
+      const nome = document.createElement("b");
+      nome.textContent = valori[CAMPI[f.key]] || "\u2014";
+      riga.append(fascia, nome);
+      frame.append(riga);
+    });
+  } catch(e) {
+    frame.textContent = "Configurazione non disponibile: il telefono non ha risposto.";
+  }
+}
 function apriStato(){ window.open(STATO + "?_=" + Date.now(), "_blank"); }
 
 function deviaImmediatamente(){
