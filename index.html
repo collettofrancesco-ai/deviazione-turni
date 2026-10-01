@@ -141,10 +141,9 @@ const PERSONE = {
 };
 
 const FASCE = [
-  { key:"mattina",    gruppo:"Lunedi - Venerdi", label:"Mattina",    orario:"08:00-14:00", alias:["mattina","mattino"] },
-  { key:"pomeriggio", gruppo:"Lunedi - Venerdi", label:"Pomeriggio", orario:"14:00-16:00", alias:["pomeriggio","pome"] },
-  { key:"sera",       gruppo:"Lunedi - Venerdi", label:"Sera",       orario:"16:00-22:00", alias:["sera","serale"] },
-  { key:"notte",      gruppo:"Lunedi - Venerdi", label:"Notte",      orario:"22:00-08:00", alias:["notte","notturno"] },
+  { key:"mattina",    gruppo:"Lunedi - Venerdi", label:"Mattina",           orario:"09:00-15:00", alias:["mattina","mattino"] },
+  { key:"pomeriggio", gruppo:"Lunedi - Venerdi", label:"Pomeriggio / Sera", orario:"15:00-22:00", alias:["pomeriggio","pome","sera","serale"] },
+  { key:"notte",      gruppo:"Lunedi - Venerdi", label:"Notte",             orario:"22:00-09:00", alias:["notte","notturno"] },
   { key:"weekend",    gruppo:"Sabato e Domenica", label:"Weekend mattina",    orario:"08:00-14:00", alias:[] },
   { key:"we_pom",     gruppo:"Sabato e Domenica", label:"Weekend pomeriggio", orario:"14:00-20:00", alias:[] },
   { key:"we_notte",   gruppo:"Sabato e Domenica", label:"Weekend notte",      orario:"20:00-08:00", alias:[] }
@@ -314,7 +313,7 @@ function interpreta(testo){
     if(!base){
       if(["mattina","mattino"].includes(p)){ base = "mattina"; continue; }
       if(["pomeriggio","pome"].includes(p)){ base = "pomeriggio"; continue; }
-      if(["sera","serale"].includes(p)){ base = "sera"; continue; }
+      if(["sera","serale"].includes(p)){ base = "pomeriggio"; continue; }
       if(["notte","notturno"].includes(p)){ base = "notte"; continue; }
     }
     if(!nome){
