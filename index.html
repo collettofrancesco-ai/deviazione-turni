@@ -95,7 +95,7 @@
   </div>
   <details>
     <summary>Mostra configurazione completa</summary>
-    <div id="stato" class="config" aria-live="polite">Caricamento…</div>
+    <div id="stato" class="config" aria-live="polite">Configurazione non ancora caricata.</div>
   </details>
   <div class="row immediate-row">
     <div class="fascia">Devia subito</div>
@@ -178,7 +178,12 @@ const CAMPI = { mattina:"MATTINA", pomeriggio:"POMERIGGIO", notte:"NOTTE",
 async function aggiorna(){
   try {
     const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
-    if(!risposta.ok) throw new Error();
+    if(risposta.status === 429){
+      const secondi = Number(risposta.headers.get("Retry-After")) || 60;
+      frame.textContent = "MacroDroid limita temporaneamente le richieste. Riprova tra circa " + Math.ceil(secondi / 60) + " min.";
+      return;
+    }
+    if(!risposta.ok) throw new Error("HTTP " + risposta.status);
     const valori = {};
     (await risposta.text()).split(";").forEach(pezzo => {
       const i = pezzo.indexOf("=");
@@ -207,7 +212,7 @@ async function aggiorna(){
       frame.append(riga);
     });
   } catch(e) {
-    frame.textContent = "Configurazione non disponibile: il telefono non ha risposto.";
+    frame.textContent = "Configurazione non disponibile: " + (e.message || "errore di rete") + ".";
   }
 }
 function apriStato(){ window.open(STATO + "?_=" + Date.now(), "_blank"); }
@@ -262,6 +267,11 @@ async function chiEAttivoOra(avviaVerifica = true){
   for(let tentativo = 0; tentativo < 10; tentativo++){
     try {
       const risposta = await fetch(STATO + "?_=" + Date.now(), {cache:"no-store"});
+      if(risposta.status === 429){
+        const secondi = Number(risposta.headers.get("Retry-After")) || 60;
+        nonVerificato("servizio MacroDroid limita le richieste: riprova tra " + Math.ceil(secondi / 60) + " min");
+        return;
+      }
       if(risposta.ok){
         const testo = await risposta.text();
         const campoReale = testo.match(/(?:^|;)\s*REALE=([^;\r\n]*)/i);
@@ -398,9 +408,7 @@ document.getElementById("cmd").addEventListener("keydown", e => {
   e.target.value = "";
 });
 
-aggiorna();
 document.getElementById("attivoOra").textContent = "Adesso: premi Aggiorna per verificare";
-setInterval(aggiorna, 60000);
 </script>
 
 </body>
