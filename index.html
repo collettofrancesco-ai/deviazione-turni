@@ -163,6 +163,9 @@ const DOM = ["domenica"];
 const canale = document.getElementById("canale");
 const frame  = document.getElementById("stato");
 const msg    = document.getElementById("msg");
+document.querySelector("details").addEventListener("toggle", e => {
+  if(e.currentTarget.open) aggiorna();
+});
 
 const operatoreImmediato = document.getElementById("operatoreImmediato");
 operatoreImmediato.innerHTML = '<option value="">&mdash; scegli operatore &mdash;</option>'
@@ -184,8 +187,10 @@ async function aggiorna(){
       return;
     }
     if(!risposta.ok) throw new Error("HTTP " + risposta.status);
+    const dati = await risposta.text();
+    if(!dati.includes("=")) throw new Error("risposta vuota o non valida");
     const valori = {};
-    (await risposta.text()).split(";").forEach(pezzo => {
+    dati.split(";").forEach(pezzo => {
       const i = pezzo.indexOf("=");
       if(i > 0) valori[pezzo.slice(0, i).trim().toUpperCase()] = pezzo.slice(i + 1).trim();
     });
