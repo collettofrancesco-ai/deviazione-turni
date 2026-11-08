@@ -107,7 +107,7 @@
 <div class="card">
   <div class="lbl">Comando rapido</div>
   <input type="text" id="cmd" placeholder="es. cambia sera con Vincenzo &mdash; oppure: weekend pomeriggio Marco" autocomplete="off">
-  <div class="hint">Fascia + nome, in qualsiasi ordine. Per il fine settimana premetti <b>weekend</b>. Aggiungi <b>adesso</b> per deviare all'istante.</div>
+  <div class="hint">Fascia + nome, in qualsiasi ordine. Per il sabato premetti <b>weekend</b>, per la domenica <b>domenica</b>. Aggiungi <b>adesso</b> per deviare all'istante.</div>
   <div class="msg" id="msg"></div>
 </div>
 
@@ -148,13 +148,17 @@ const FASCE = [
   { key:"mattina",    gruppo:"Lunedi - Venerdi", label:"Mattina",           orario:"09:00-15:00", alias:["mattina","mattino"] },
   { key:"pomeriggio", gruppo:"Lunedi - Venerdi", label:"Pomeriggio / Sera", orario:"15:00-22:00", alias:["pomeriggio","pome","sera","serale"] },
   { key:"notte",      gruppo:"Lunedi - Venerdi", label:"Notte",             orario:"22:00-09:00", alias:["notte","notturno"] },
-  { key:"weekend",    gruppo:"Sabato e Domenica", label:"Weekend mattina",    orario:"08:00-14:00", alias:[] },
-  { key:"we_pom",     gruppo:"Sabato e Domenica", label:"Weekend pomeriggio", orario:"14:00-20:00", alias:[] },
-  { key:"we_notte",   gruppo:"Sabato e Domenica", label:"Weekend notte",      orario:"20:00-08:00", alias:[] }
+  { key:"weekend",    gruppo:"Sabato", label:"Weekend mattina",    orario:"08:00-14:00", alias:[] },
+  { key:"we_pom",     gruppo:"Sabato", label:"Weekend pomeriggio", orario:"14:00-20:00", alias:[] },
+  { key:"we_notte",   gruppo:"Sabato", label:"Weekend notte",      orario:"20:00-08:00", alias:[] },
+  { key:"dom_mattina", gruppo:"Domenica", label:"Domenica mattina",    orario:"08:00-16:00", alias:[] },
+  { key:"dom_pom",     gruppo:"Domenica", label:"Domenica pomeriggio", orario:"16:00-24:00", alias:[] },
+  { key:"dom_notte",   gruppo:"Domenica", label:"Domenica notte",      orario:"00:00-08:00 (lunedi)", alias:[] }
 ];
 
 const ORA = ["adesso","subito","ora","immediatamente"];
-const WE  = ["weekend","week-end","sabato","domenica","festivo","festivi"];
+const WE  = ["weekend","week-end","sabato","festivo","festivi"];
+const DOM = ["domenica"];
 
 const canale = document.getElementById("canale");
 const frame  = document.getElementById("stato");
@@ -167,7 +171,8 @@ operatoreImmediato.innerHTML = '<option value="">&mdash; scegli operatore &mdash
 function vai(url){ canale.src = url; }
 function dimmi(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
 const CAMPI = { mattina:"MATTINA", pomeriggio:"POMERIGGIO", notte:"NOTTE",
-                weekend:"WE_MATTINA", we_pom:"WE_POMERIGGIO", we_notte:"WE_NOTTE" };
+                weekend:"WE_MATTINA", we_pom:"WE_POMERIGGIO", we_notte:"WE_NOTTE",
+                dom_mattina:"DOM_MATTINA", dom_pom:"DOM_POMERIGGIO", dom_notte:"DOM_NOTTE" };
 
 // Legge la configurazione dal telefono e mostra solo le fasce in uso.
 async function aggiorna(){
@@ -347,11 +352,12 @@ function normalizza(s){
 
 function interpreta(testo){
   const parole = normalizza(testo).split(" ");
-  let weekend = false, base = null, nome = null, subito = false;
+  let weekend = false, domenica = false, base = null, nome = null, subito = false;
 
   for(const p of parole){
     if(ORA.includes(p)) subito = true;
     if(WE.includes(p)){ weekend = true; continue; }
+    if(DOM.includes(p)){ domenica = true; continue; }
     if(!base){
       if(["mattina","mattino"].includes(p)){ base = "mattina"; continue; }
       if(["pomeriggio","pome"].includes(p)){ base = "pomeriggio"; continue; }
@@ -365,7 +371,11 @@ function interpreta(testo){
   }
 
   let fascia = null;
-  if(weekend){
+  if(domenica){
+    if(base === "mattina") fascia = "dom_mattina";
+    else if(base === "pomeriggio" || base === "sera") fascia = "dom_pom";
+    else if(base === "notte") fascia = "dom_notte";
+  } else if(weekend){
     if(base === "mattina") fascia = "weekend";
     else if(base === "pomeriggio" || base === "sera") fascia = "we_pom";
     else if(base === "notte") fascia = "we_notte";
