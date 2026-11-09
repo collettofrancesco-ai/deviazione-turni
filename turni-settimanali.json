@@ -8,9 +8,29 @@
       "operatore": "Ambra"
     },
     {
+      "data": "2026-11-09",
+      "fascia": "pomeriggio",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-11-09",
+      "fascia": "notte",
+      "operatore": "Ambra"
+    },
+    {
       "data": "2026-11-10",
       "fascia": "mattina",
       "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-10",
+      "fascia": "pomeriggio",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-10",
+      "fascia": "notte",
+      "operatore": "Ignazio"
     },
     {
       "data": "2026-11-11",
@@ -18,14 +38,44 @@
       "operatore": "Roberta"
     },
     {
+      "data": "2026-11-11",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-11",
+      "fascia": "notte",
+      "operatore": "Alessandro"
+    },
+    {
       "data": "2026-11-12",
       "fascia": "mattina",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-12",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-12",
+      "fascia": "notte",
       "operatore": "Roberta"
     },
     {
       "data": "2026-11-13",
       "fascia": "mattina",
       "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-13",
+      "fascia": "pomeriggio",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-11-13",
+      "fascia": "notte",
+      "operatore": "Marilena"
     }
   ]
 }
