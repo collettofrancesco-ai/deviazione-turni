@@ -169,14 +169,9 @@ def main():
         if status in {"verificata", "saltata_operatore_mancante", "errore_verifica", "mancata_finestra", "operatore_non_in_rubrica"}:
             continue
         if status == "in_attesa_verifica":
-            if now >= start:
-                state["events"][event_id] = record_for(entry, field, "errore_verifica", "Il dato non è risultato verificabile prima dell'inizio fascia.", sent_at=previous.get("inviato_il"))
-                annotate("error", f"Verifica non riuscita prima dell'inizio: {entry['data']} {entry['fascia']}.")
+            verify(entry, field, entry["operatore"], zone, start, state, event_id, previous)
+            if state["events"][event_id]["status"] == "errore_verifica":
                 errors.append(event_id)
-            else:
-                verify(entry, field, entry["operatore"], zone, start, state, event_id, previous)
-                if state["events"][event_id]["status"] == "errore_verifica":
-                    errors.append(event_id)
             continue
 
         remaining = start - now
