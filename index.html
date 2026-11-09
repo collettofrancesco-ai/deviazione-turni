@@ -76,6 +76,14 @@
     input[type=text]{font-size:16px}
     .nota{line-height:1.45}
   }
+
+  .piano-grid{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .piano-grid input[type=file]{max-width:100%;color:var(--dim);font-size:13px}
+  .piano-grid textarea{width:100%;min-height:190px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:10px;font:12px/1.5 ui-monospace,SFMono-Regular,monospace}
+  .button-link{display:inline-block;text-decoration:none;background:var(--accent);color:#06121f;border:1px solid var(--accent);border-radius:6px;padding:9px 14px;font-size:13.5px;font-weight:600}
+  .piano-risultato{font-size:13px;margin-top:10px;line-height:1.5}
+  .piano-risultato.ok{color:var(--ok)} .piano-risultato.err{color:var(--warn)}
+  .piano-status{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);line-height:1.6}
 </style>
 </head>
 <body>
@@ -118,6 +126,20 @@
     <b>Imposta</b> registra la persona: la deviazione parte al prossimo orario della fascia.<br>
     <b>Attiva ora</b> registra <i>e</i> devia subito, scavalcando l'orario.
   </div>
+</div>
+
+
+<div class="card" id="pianoSettimanale">
+  <div class="lbl">Carica o aggiorna il piano settimanale (JSON)</div>
+  <div class="nota">Seleziona un file JSON con i campi <code>data</code>, <code>fascia</code> e <code>operatore</code>. Il controllo usa le stesse fasce e gli stessi nomi di questa pagina. Gli operatori non presenti in rubrica vengono segnalati e saltati.</div>
+  <div class="piano-grid">
+    <input type="file" id="caricaPiano" accept=".json,application/json" aria-label="Carica JSON dei turni">
+    <button type="button" id="copiaPiano" disabled>Copia JSON verificato</button>
+    <a class="button-link" href="https://github.com/collettofrancesco-ai/deviazione-turni/edit/gh-pages/turni-settimanali.json" target="_blank" rel="noopener">Apri GitHub per pubblicarlo</a>
+  </div>
+  <div id="esitoPiano" class="piano-risultato" role="status" aria-live="polite">Dopo aver caricato il JSON, copialo nel file del repository e fai Commit changes: da quel momento l'automazione lo userà.</div>
+  <textarea id="anteprimaPiano" readonly aria-label="Anteprima JSON verificato" placeholder="Il JSON verificato apparirà qui."></textarea>
+  <div id="statoAutomazione" class="piano-status" aria-live="polite">Lettura dell'ultimo esito automatico…</div>
 </div>
 
 <iframe id="canale" style="display:none" title="canale"></iframe>
@@ -414,6 +436,118 @@ document.getElementById("cmd").addEventListener("keydown", e => {
 });
 
 document.getElementById("attivoOra").textContent = "Adesso: premi Aggiorna per verificare";
+
+const uploadPiano = document.getElementById("caricaPiano");
+const copiaPiano = document.getElementById("copiaPiano");
+const anteprimaPiano = document.getElementById("anteprimaPiano");
+const esitoPiano = document.getElementById("esitoPiano");
+const statoAutomazione = document.getElementById("statoAutomazione");
+
+function validaPiano(piano){
+  const errori = [];
+  const avvisi = [];
+  if(!piano || typeof piano !== "object" || !Array.isArray(piano.turni)){
+    return {errori:["Il JSON deve contenere l'array 'turni'."],avvisi:[]};
+  }
+  const chiavi = new Set(FASCE.map(f => f.key));
+  const viste = new Set();
+  piano.turni.forEach((t, i) => {
+    const r = i + 1;
+    if(!t || typeof t !== "object"){ errori.push("Riga " + r + ": turno non valido."); return; }
+    const dataUtc = new Date((t.data || "") + "T00:00:00Z");
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(t.data || "") || Number.isNaN(dataUtc.getTime()) || dataUtc.toISOString().slice(0,10) !== t.data){
+      errori.push("Riga " + r + ": data non valida (usa AAAA-MM-GG)."); return;
+    }
+    const key = t.data + "|" + t.fascia;
+    if(viste.has(key)) errori.push("Riga " + r + ": data e fascia duplicate.");
+    viste.add(key);
+    if(!chiavi.has(t.fascia)){ errori.push("Riga " + r + ": fascia non riconosciuta."); return; }
+    if(typeof t.operatore !== "string" || !t.operatore.trim()){
+      errori.push("Riga " + r + ": operatore mancante."); return;
+    }
+    const giorno = new Date(t.data + "T12:00:00Z").getUTCDay();
+    const weekday = ["mattina","pomeriggio","notte"].includes(t.fascia);
+    const saturday = ["weekend","we_pom","we_notte"].includes(t.fascia);
+    const sunday = ["dom_mattina","dom_pom"].includes(t.fascia);
+    const sundayNight = t.fascia === "dom_notte";
+    if((weekday && (giorno < 1 || giorno > 5)) ||
+       (saturday && giorno !== 6) ||
+       (sunday && giorno !== 0) ||
+       (sundayNight && giorno !== 1)){
+      errori.push("Riga " + r + ": la data non corrisponde alla fascia " + t.fascia + ".");
+    }
+    if(!Object.prototype.hasOwnProperty.call(PERSONE,t.operatore.trim())){
+      avvisi.push("Riga " + r + ": " + t.operatore + " non è in rubrica; l'automazione lascerà invariata questa fascia.");
+    }
+  });
+  if(!piano.turni.length) errori.push("Il piano non contiene turni.");
+  return {errori,avvisi};
+}
+
+uploadPiano.addEventListener("change", async e => {
+  copiaPiano.disabled = true;
+  anteprimaPiano.value = "";
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  try{
+    const piano = JSON.parse(await file.text());
+    const check = validaPiano(piano);
+    if(check.errori.length){
+      esitoPiano.className = "piano-risultato err";
+      esitoPiano.textContent = "JSON non valido: " + check.errori.join(" ");
+      return;
+    }
+    const normalizzato = JSON.stringify(piano,null,2) + "\n";
+    anteprimaPiano.value = normalizzato;
+    copiaPiano.disabled = false;
+    esitoPiano.className = check.avvisi.length ? "piano-risultato err" : "piano-risultato ok";
+    esitoPiano.textContent = "JSON valido: " + piano.turni.length + " turni." +
+      (check.avvisi.length ? " " + check.avvisi.join(" ") : " Nomi e fasce riconosciuti.");
+  }catch(err){
+    esitoPiano.className = "piano-risultato err";
+    esitoPiano.textContent = "Impossibile leggere il JSON: " + err.message;
+  }
+});
+copiaPiano.addEventListener("click", async () => {
+  try{
+    await navigator.clipboard.writeText(anteprimaPiano.value);
+    esitoPiano.textContent += " Copiato: ora apri GitHub, sostituisci il contenuto del file e fai Commit changes.";
+  }catch(err){
+    anteprimaPiano.focus(); anteprimaPiano.select();
+    esitoPiano.textContent = "Selezionato il JSON: copialo con ⌘C e incollalo nel file su GitHub.";
+  }
+});
+
+async function mostraEsitoAutomazione(){
+  try{
+    const r = await fetch("automation-state.json?_=" + Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const dati = await r.json();
+    const eventi = Object.values(dati.events || {}).sort((a,b) => (b.inviato_il||b.data||"").localeCompare(a.inviato_il||a.data||""));
+    if(!eventi.length){
+      statoAutomazione.textContent = "Automazione: nessun turno ancora eseguito.";
+      return;
+    }
+    const righe = eventosParaMostrar(eventi.slice(0,5));
+    statoAutomazione.textContent = "Ultimi esiti automatici · " + righe.join(" · ");
+  }catch(err){
+    statoAutomazione.textContent = "Esito automatico temporaneamente non disponibile.";
+  }
+}
+function eventosParaMostrar(eventi){
+  const labels = {
+    verificata:"verificata",
+    in_attesa_verifica:"in attesa verifica",
+    saltata_operatore_mancante:"saltata: operatore non in rubrica",
+    operatore_non_in_rubrica:"saltata: codice mancante/non valido",
+    errore_verifica:"ERRORE: stato non coincidente",
+    mancata_finestra:"non eseguita: finestra superata"
+  };
+  return eventi.map(e => (e.data || "") + " " + (e.fascia || "") + " " +
+    (e.operatore || "") + " — " + (labels[e.status] || "stato: " + e.status));
+}
+mostraEsitoAutomazione();
+
 </script>
 
 </body>
