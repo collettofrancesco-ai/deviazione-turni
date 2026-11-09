@@ -1,0 +1,31 @@
+{
+  "timezone": "Europe/Rome",
+  "settimana": "2026-11-09/2026-11-15",
+  "turni": [
+    {
+      "data": "2026-11-09",
+      "fascia": "mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-10",
+      "fascia": "mattina",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-11",
+      "fascia": "mattina",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-12",
+      "fascia": "mattina",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-13",
+      "fascia": "mattina",
+      "operatore": "Ambra"
+    }
+  ]
+}
