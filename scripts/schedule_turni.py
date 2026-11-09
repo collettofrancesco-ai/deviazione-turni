@@ -178,14 +178,15 @@ def main():
             continue
 
         remaining = start - now
-        catchup = remaining <= LATE_WINDOW and now - start <= CATCHUP_WINDOW
-        if remaining <= LATE_WINDOW and not catchup:
+        late_by = now - start
+        catchup = timedelta(0) <= late_by <= CATCHUP_WINDOW
+        if now >= start and not catchup:
             state["events"][event_id] = record_for(entry, field, "mancata_finestra", "Finestra di invio superata; nessun comando inviato.")
-            if now - start <= timedelta(hours=24):
+            if late_by <= timedelta(hours=24):
                 annotate("error", f"Fascia non impostata in tempo: {entry['data']} {entry['fascia']}.")
                 errors.append(event_id)
             continue
-        if remaining > EARLY_WINDOW:
+        if not catchup and remaining > EARLY_WINDOW:
             continue
 
         name = entry["operatore"].strip()
