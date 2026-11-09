@@ -3,6 +3,7 @@
 import json
 import re
 import sys
+import time as time_module
 from datetime import datetime, time, timedelta
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -17,8 +18,10 @@ INDEX_FILE = ROOT / "index.html"
 DEVICE_ID = "14510559-534a-4512-9e6d-8af51cc129f8"
 SET_URL = f"https://trigger.macrodroid.com/{DEVICE_ID}/turni"
 STATUS_URL = f"https://ask.macrodroid.com/{DEVICE_ID}/stato_turni"
-EARLY_WINDOW = timedelta(minutes=14)
+EARLY_WINDOW = timedelta(minutes=90)
 LATE_WINDOW = timedelta(minutes=4)
+CATCHUP_WINDOW = timedelta(minutes=45)
+DEVIA_URL = f"https://trigger.macrodroid.com/{DEVICE_ID}/devia"
 
 # These keys and start times mirror FASCE in index.html.
 SHIFT_RULES = {
@@ -29,7 +32,7 @@ SHIFT_RULES = {
     "we_pom": ((5,), time(14, 0), "WE_POMERIGGIO"),
     "we_notte": ((5,), time(20, 0), "WE_NOTTE"),
     "dom_mattina": ((6,), time(8, 0), "DOM_MATTINA"),
-    "dom_pom": ((6,), time(16, 0), "DOM_POM"),
+    "dom_pom": ((6,), time(16, 0), "DOM_POMERIGGIO"),
     # The Sunday-night variable starts at 00:00 on Monday.
     "dom_notte": ((0,), time(0, 0), "DOM_NOTTE"),
 }
@@ -175,18 +178,12 @@ def main():
             continue
 
         remaining = start - now
-        if remaining <= timedelta(0):
-            # Old plans are marked quietly; a recent missed run is reported.
-            is_recent = now - start <= timedelta(hours=24)
+        catchup = remaining <= LATE_WINDOW and now - start <= CATCHUP_WINDOW
+        if remaining <= LATE_WINDOW and not catchup:
             state["events"][event_id] = record_for(entry, field, "mancata_finestra", "Finestra di invio superata; nessun comando inviato.")
-            if is_recent:
+            if now - start <= timedelta(hours=24):
                 annotate("error", f"Fascia non impostata in tempo: {entry['data']} {entry['fascia']}.")
                 errors.append(event_id)
-            continue
-        if remaining <= LATE_WINDOW:
-            state["events"][event_id] = record_for(entry, field, "mancata_finestra", "Finestra di invio superata; nessun comando inviato.")
-            annotate("error", f"Finestra utile superata per {entry['data']} {entry['fascia']}; nessun comando inviato.")
-            errors.append(event_id)
             continue
         if remaining > EARLY_WINDOW:
             continue
@@ -204,8 +201,14 @@ def main():
             errors.append(event_id)
             continue
 
-        query = urlencode({f"op_{entry['fascia']}": code, f"nome_{entry['fascia']}": name})
-        http_code, _ = request_text(f"{SET_URL}?{query}")
+        params = {f"op_{entry['fascia']}": code, f"nome_{entry['fascia']}": name}
+        if catchup:
+            params["dial_now"] = code
+        http_code, _ = request_text(f"{SET_URL}?{urlencode(params)}")
+        if catchup and 200 <= http_code < 300:
+            time_module.sleep(2)
+            request_text(DEVIA_URL)
+            annotate("warning", f"Fascia {entry['data']} {entry['fascia']} impostata in ritardo con deviazione immediata.")
         if http_code < 200 or http_code >= 300:
             annotate("error", f"MacroDroid non ha accettato il comando per {entry['data']} {entry['fascia']} (HTTP {http_code or 'rete'}).")
             errors.append(event_id)

@@ -76,6 +76,31 @@
       "data": "2026-11-13",
       "fascia": "notte",
       "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-14",
+      "fascia": "weekend",
+      "operatore": "Francesco"
+    },
+    {
+      "data": "2026-11-14",
+      "fascia": "we_pom",
+      "operatore": "Ignazio"
+    },
+    {
+      "data": "2026-11-14",
+      "fascia": "we_notte",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-11-15",
+      "fascia": "dom_mattina",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-11-16",
+      "fascia": "dom_notte",
+      "operatore": "Marilena"
     }
   ]
 }
