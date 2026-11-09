@@ -140,6 +140,7 @@ def main():
     fasce = load_fasce()
     state = load_json(STATE_FILE, {"events": {}})
     state.setdefault("events", {})
+    original_events = json.dumps(state["events"], ensure_ascii=False, sort_keys=True)
     now = datetime.now(zone)
     seen = set()
     errors = []
@@ -223,7 +224,8 @@ def main():
     # Keep the public status file compact.
     cutoff = (now.date() - timedelta(days=60)).isoformat()
     state["events"] = {key: value for key, value in state["events"].items() if value.get("data", "") >= cutoff}
-    save_state(state)
+    if json.dumps(state["events"], ensure_ascii=False, sort_keys=True) != original_events:
+        save_state(state)
     if errors:
         return 1
     return 0
