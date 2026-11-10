@@ -24,14 +24,6 @@
       "campo": "NOTTE",
       "status": "verificata",
       "inviato_il": "2026-11-09T21:15:47+01:00"
-    },
-    "2026-11-10|mattina": {
-      "data": "2026-11-10",
-      "fascia": "mattina",
-      "operatore": "Marilena",
-      "campo": "MATTINA",
-      "status": "verificata",
-      "inviato_il": "2026-11-10T08:23:43+01:00"
     }
   }
 }
