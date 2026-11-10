@@ -218,6 +218,18 @@ async function aggiorna(){
       if(i > 0) valori[pezzo.slice(0, i).trim().toUpperCase()] = pezzo.slice(i + 1).trim();
     });
     frame.textContent = "";
+    const pianificati = {};
+    try{
+      const rp = await fetch("turni-settimanali.json?_=" + Date.now(), {cache:"no-store"});
+      if(rp.ok){
+        const pj = await rp.json();
+        const lista = Array.isArray(pj) ? pj : (pj.turni || pj.assegnazioni || []);
+        const oggi = new Date().toLocaleDateString("sv-SE", {timeZone:"Europe/Rome"});
+        lista.filter(e => e.data >= oggi).sort((a,b) => a.data.localeCompare(b.data)).forEach(e => {
+          if(!pianificati[e.fascia]) pianificati[e.fascia] = e;
+        });
+      }
+    }catch(_){}
     let gruppo = null;
     FASCE.forEach(f => {
       if(f.gruppo !== gruppo){
@@ -235,7 +247,14 @@ async function aggiorna(){
       ore.textContent = f.orario;
       fascia.append(ore);
       const nome = document.createElement("b");
-      nome.textContent = valori[CAMPI[f.key]] || "\u2014";
+      const attuale = valori[CAMPI[f.key]];
+      const prev = pianificati[f.key];
+      if(prev && (!attuale || attuale === "\u2014")){
+        const [, mm, gg] = prev.data.split("-");
+        nome.textContent = prev.operatore + " \u00b7 pianificato " + gg + "/" + mm;
+      } else {
+        nome.textContent = attuale || "\u2014";
+      }
       riga.append(fascia, nome);
       frame.append(riga);
     });
