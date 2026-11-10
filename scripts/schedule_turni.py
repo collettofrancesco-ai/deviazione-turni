@@ -18,7 +18,7 @@ INDEX_FILE = ROOT / "index.html"
 DEVICE_ID = "14510559-534a-4512-9e6d-8af51cc129f8"
 SET_URL = f"https://trigger.macrodroid.com/{DEVICE_ID}/turni"
 STATUS_URL = f"https://ask.macrodroid.com/{DEVICE_ID}/stato_turni"
-EARLY_WINDOW = timedelta(minutes=90)
+EARLY_WINDOW = timedelta(minutes=180)
 LATE_WINDOW = timedelta(minutes=4)
 CATCHUP_WINDOW = timedelta(minutes=45)
 DEVIA_URL = f"https://trigger.macrodroid.com/{DEVICE_ID}/devia"
