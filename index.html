@@ -249,7 +249,7 @@ async function aggiorna(){
       const nome = document.createElement("b");
       const attuale = valori[CAMPI[f.key]];
       const prev = pianificati[f.key];
-      if(prev && (!attuale || attuale === "\u2014")){
+      if(prev && prev.operatore !== attuale){
         const [, mm, gg] = prev.data.split("-");
         nome.textContent = prev.operatore + " \u00b7 pianificato " + gg + "/" + mm;
       } else {
