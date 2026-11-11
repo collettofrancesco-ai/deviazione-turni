@@ -1,6 +1,6 @@
 {
   "timezone": "Europe/Rome",
-  "settimana": "2026-11-09/2026-11-15",
+  "settimana": "2026-11-09/2026-11-22",
   "turni": [
     {
       "data": "2026-11-09",
@@ -106,6 +106,96 @@
       "data": "2026-11-16",
       "fascia": "dom_notte",
       "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-16",
+      "fascia": "mattina",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-16",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-16",
+      "fascia": "notte",
+      "operatore": "Ignazio"
+    },
+    {
+      "data": "2026-11-17",
+      "fascia": "mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-17",
+      "fascia": "pomeriggio",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-17",
+      "fascia": "notte",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-18",
+      "fascia": "mattina",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-18",
+      "fascia": "pomeriggio",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-18",
+      "fascia": "notte",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-19",
+      "fascia": "mattina",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-19",
+      "fascia": "pomeriggio",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-11-19",
+      "fascia": "notte",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-20",
+      "fascia": "mattina",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-20",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-21",
+      "fascia": "weekend",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-11-21",
+      "fascia": "we_pom",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-22",
+      "fascia": "dom_pom",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-11-23",
+      "fascia": "dom_notte",
+      "operatore": "Roberta"
     }
   ]
 }
