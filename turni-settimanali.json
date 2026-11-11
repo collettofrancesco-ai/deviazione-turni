@@ -178,6 +178,11 @@
       "operatore": "Ambra"
     },
     {
+      "data": "2026-11-20",
+      "fascia": "notte",
+      "operatore": "Mariangela"
+    },
+    {
       "data": "2026-11-21",
       "fascia": "weekend",
       "operatore": "Vincenzo"
@@ -188,9 +193,19 @@
       "operatore": "Ambra"
     },
     {
+      "data": "2026-11-21",
+      "fascia": "we_notte",
+      "operatore": "Nestore"
+    },
+    {
       "data": "2026-11-22",
       "fascia": "dom_pom",
       "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-11-22",
+      "fascia": "dom_mattina",
+      "operatore": "Roberto"
     },
     {
       "data": "2026-11-23",
