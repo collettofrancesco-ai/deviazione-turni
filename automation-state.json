@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-12T06:16:02+01:00",
+  "updated_at": "2026-11-12T12:16:26+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -80,6 +80,14 @@
       "campo": "MATTINA",
       "status": "verificata",
       "inviato_il": "2026-11-12T06:16:01+01:00"
+    },
+    "2026-11-12|pomeriggio": {
+      "data": "2026-11-12",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra",
+      "campo": "POMERIGGIO",
+      "status": "verificata",
+      "inviato_il": "2026-11-12T12:16:25+01:00"
     }
   }
 }
