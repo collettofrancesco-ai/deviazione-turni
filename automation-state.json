@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-12T19:15:37+01:00",
+  "updated_at": "2026-11-13T06:16:33+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -96,6 +96,14 @@
       "campo": "NOTTE",
       "status": "verificata",
       "inviato_il": "2026-11-12T19:15:36+01:00"
+    },
+    "2026-11-13|mattina": {
+      "data": "2026-11-13",
+      "fascia": "mattina",
+      "operatore": "Ambra",
+      "campo": "MATTINA",
+      "status": "verificata",
+      "inviato_il": "2026-11-13T06:16:32+01:00"
     }
   }
 }
