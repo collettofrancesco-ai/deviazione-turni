@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-15T05:10:09+01:00",
+  "updated_at": "2026-11-15T13:16:21+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -152,6 +152,14 @@
       "campo": "DOM_MATTINA",
       "status": "verificata",
       "inviato_il": "2026-11-15T05:10:08+01:00"
+    },
+    "2026-11-15|dom_pom": {
+      "data": "2026-11-15",
+      "fascia": "dom_pom",
+      "operatore": "Pirrone",
+      "campo": "DOM_POMERIGGIO",
+      "status": "verificata",
+      "inviato_il": "2026-11-15T13:16:20+01:00"
     }
   }
 }
