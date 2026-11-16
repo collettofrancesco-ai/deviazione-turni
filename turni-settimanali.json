@@ -309,6 +309,11 @@
     },
     {
       "data": "2026-11-30",
+      "fascia": "dom_notte",
+      "operatore": "Francesco"
+    },
+    {
+      "data": "2026-11-30",
       "fascia": "mattina",
       "operatore": "Roberta"
     },
