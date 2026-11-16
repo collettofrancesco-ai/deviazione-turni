@@ -325,7 +325,7 @@
     {
       "data": "2026-12-01",
       "fascia": "mattina",
-      "operatore": "Alessandro"
+      "operatore": "Ambra"
     },
     {
       "data": "2026-12-01",
@@ -396,6 +396,11 @@
       "data": "2026-12-05",
       "fascia": "weekend",
       "operatore": "Roberta"
+    },
+    {
+      "data": "2026-12-06",
+      "fascia": "dom_mattina",
+      "operatore": "Marco"
     },
     {
       "data": "2026-12-06",
