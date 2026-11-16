@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-15T21:15:45+01:00",
+  "updated_at": "2026-11-16T06:16:20+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -168,6 +168,14 @@
       "campo": "DOM_NOTTE",
       "status": "verificata",
       "inviato_il": "2026-11-15T21:15:44+01:00"
+    },
+    "2026-11-16|mattina": {
+      "data": "2026-11-16",
+      "fascia": "mattina",
+      "operatore": "Roberta",
+      "campo": "MATTINA",
+      "status": "verificata",
+      "inviato_il": "2026-11-16T06:16:18+01:00"
     }
   }
 }
