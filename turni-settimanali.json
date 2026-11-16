@@ -259,6 +259,11 @@
     },
     {
       "data": "2026-11-26",
+      "fascia": "mattina",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-11-26",
       "fascia": "notte",
       "operatore": "Roberta"
     },
@@ -276,6 +281,11 @@
       "data": "2026-11-27",
       "fascia": "notte",
       "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-11-28",
+      "fascia": "we_notte",
+      "operatore": "Davide"
     },
     {
       "data": "2026-11-28",
