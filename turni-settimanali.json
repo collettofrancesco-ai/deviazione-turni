@@ -1,6 +1,6 @@
 {
   "timezone": "Europe/Rome",
-  "settimana": "2026-11-09/2026-11-22",
+  "settimana": "2026-11-09/2026-11-29",
   "turni": [
     {
       "data": "2026-11-09",
@@ -9,23 +9,18 @@
     },
     {
       "data": "2026-11-09",
-      "fascia": "pomeriggio",
-      "operatore": "Vincenzo"
+      "fascia": "notte",
+      "operatore": "Ambra"
     },
     {
       "data": "2026-11-09",
-      "fascia": "notte",
-      "operatore": "Ambra"
+      "fascia": "pomeriggio",
+      "operatore": "Vincenzo"
     },
     {
       "data": "2026-11-10",
       "fascia": "mattina",
       "operatore": "Vincenzo"
-    },
-    {
-      "data": "2026-11-10",
-      "fascia": "pomeriggio",
-      "operatore": "Roberta"
     },
     {
       "data": "2026-11-10",
@@ -33,8 +28,18 @@
       "operatore": "Ignazio"
     },
     {
+      "data": "2026-11-10",
+      "fascia": "pomeriggio",
+      "operatore": "Roberta"
+    },
+    {
       "data": "2026-11-11",
       "fascia": "mattina",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-11-11",
+      "fascia": "notte",
       "operatore": "Vincenzo"
     },
     {
@@ -43,13 +48,13 @@
       "operatore": "Roberta"
     },
     {
-      "data": "2026-11-11",
-      "fascia": "notte",
-      "operatore": "Vincenzo"
+      "data": "2026-11-12",
+      "fascia": "mattina",
+      "operatore": "Roberta"
     },
     {
       "data": "2026-11-12",
-      "fascia": "mattina",
+      "fascia": "notte",
       "operatore": "Roberta"
     },
     {
@@ -58,19 +63,9 @@
       "operatore": "Ambra"
     },
     {
-      "data": "2026-11-12",
-      "fascia": "notte",
-      "operatore": "Roberta"
-    },
-    {
       "data": "2026-11-13",
       "fascia": "mattina",
       "operatore": "Ambra"
-    },
-    {
-      "data": "2026-11-13",
-      "fascia": "pomeriggio",
-      "operatore": "Vincenzo"
     },
     {
       "data": "2026-11-13",
@@ -78,9 +73,14 @@
       "operatore": "Marilena"
     },
     {
+      "data": "2026-11-13",
+      "fascia": "pomeriggio",
+      "operatore": "Vincenzo"
+    },
+    {
       "data": "2026-11-14",
-      "fascia": "weekend",
-      "operatore": "Francesco"
+      "fascia": "we_notte",
+      "operatore": "Vincenzo"
     },
     {
       "data": "2026-11-14",
@@ -89,8 +89,8 @@
     },
     {
       "data": "2026-11-14",
-      "fascia": "we_notte",
-      "operatore": "Vincenzo"
+      "fascia": "weekend",
+      "operatore": "Francesco"
     },
     {
       "data": "2026-11-15",
@@ -114,17 +114,22 @@
     },
     {
       "data": "2026-11-16",
-      "fascia": "pomeriggio",
-      "operatore": "Ambra"
-    },
-    {
-      "data": "2026-11-16",
       "fascia": "notte",
       "operatore": "Ignazio"
     },
     {
+      "data": "2026-11-16",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra"
+    },
+    {
       "data": "2026-11-17",
       "fascia": "mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-17",
+      "fascia": "notte",
       "operatore": "Ambra"
     },
     {
@@ -133,28 +138,28 @@
       "operatore": "Marilena"
     },
     {
-      "data": "2026-11-17",
-      "fascia": "notte",
-      "operatore": "Ambra"
-    },
-    {
       "data": "2026-11-18",
       "fascia": "mattina",
       "operatore": "Roberta"
     },
     {
       "data": "2026-11-18",
-      "fascia": "pomeriggio",
-      "operatore": "Marilena"
+      "fascia": "notte",
+      "operatore": "Roberta"
     },
     {
       "data": "2026-11-18",
-      "fascia": "notte",
-      "operatore": "Roberta"
+      "fascia": "pomeriggio",
+      "operatore": "Marilena"
     },
     {
       "data": "2026-11-19",
       "fascia": "mattina",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-19",
+      "fascia": "notte",
       "operatore": "Marilena"
     },
     {
@@ -163,19 +168,9 @@
       "operatore": "Vincenzo"
     },
     {
-      "data": "2026-11-19",
-      "fascia": "notte",
-      "operatore": "Marilena"
-    },
-    {
       "data": "2026-11-20",
       "fascia": "mattina",
       "operatore": "Roberta"
-    },
-    {
-      "data": "2026-11-20",
-      "fascia": "pomeriggio",
-      "operatore": "Ambra"
     },
     {
       "data": "2026-11-20",
@@ -183,13 +178,8 @@
       "operatore": "Mariangela"
     },
     {
-      "data": "2026-11-21",
-      "fascia": "weekend",
-      "operatore": "Vincenzo"
-    },
-    {
-      "data": "2026-11-21",
-      "fascia": "we_pom",
+      "data": "2026-11-20",
+      "fascia": "pomeriggio",
       "operatore": "Ambra"
     },
     {
@@ -198,9 +188,14 @@
       "operatore": "Nestore"
     },
     {
-      "data": "2026-11-22",
-      "fascia": "dom_pom",
-      "operatore": "Alessandro"
+      "data": "2026-11-21",
+      "fascia": "we_pom",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-21",
+      "fascia": "weekend",
+      "operatore": "Vincenzo"
     },
     {
       "data": "2026-11-22",
@@ -208,9 +203,99 @@
       "operatore": "Roberto"
     },
     {
+      "data": "2026-11-22",
+      "fascia": "dom_pom",
+      "operatore": "Alessandro"
+    },
+    {
       "data": "2026-11-23",
       "fascia": "dom_notte",
       "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-23",
+      "fascia": "mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-23",
+      "fascia": "notte",
+      "operatore": "Ignazio"
+    },
+    {
+      "data": "2026-11-23",
+      "fascia": "pomeriggio",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-24",
+      "fascia": "mattina",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-24",
+      "fascia": "notte",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-24",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-25",
+      "fascia": "mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-25",
+      "fascia": "notte",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-11-25",
+      "fascia": "pomeriggio",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-26",
+      "fascia": "notte",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-11-26",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-27",
+      "fascia": "mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-27",
+      "fascia": "notte",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-11-28",
+      "fascia": "we_pom",
+      "operatore": "Ignazio"
+    },
+    {
+      "data": "2026-11-28",
+      "fascia": "weekend",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-11-29",
+      "fascia": "dom_mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-11-29",
+      "fascia": "dom_pom",
+      "operatore": "Alessandro"
     }
   ]
 }
