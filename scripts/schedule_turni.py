@@ -105,12 +105,14 @@ def record_for(entry, field, status, message=None, sent_at=None):
         out["inviato_il"] = sent_at
     return out
 
-def valid_start(entry, zone, valid_keys):
+def valid_start(entry, zone, valid_keys, festivi=frozenset()):
     day = datetime.strptime(entry["data"], "%Y-%m-%d").date()
     key = entry["fascia"]
     if key not in valid_keys or key not in SHIFT_RULES:
         raise ValueError(f"Fascia non riconosciuta: {key}")
     allowed_days, start_time, field = SHIFT_RULES[key]
+    if entry["data"] in festivi and key in ("dom_mattina", "dom_pom"):
+        allowed_days = (day.weekday(),)
     if day.weekday() not in allowed_days:
         raise ValueError(f"La fascia {key} non è prevista per la data {entry['data']}.")
     return datetime.combine(day, start_time, tzinfo=zone), field
@@ -137,6 +139,7 @@ def main():
     zone_name = plan.get("timezone", "Europe/Rome")
     zone = ZoneInfo(zone_name)
     entries = plan.get("turni", [])
+    festivi = frozenset(plan.get("festivi", []))
     if not isinstance(entries, list):
         raise ValueError("Il campo 'turni' deve essere una lista.")
     people = load_people()
@@ -157,7 +160,12 @@ def main():
         seen.add(event_id)
         if not isinstance(entry["operatore"], str) or not entry["operatore"].strip():
             raise ValueError(f"Operatore vuoto per {event_id}.")
-        start, field = valid_start(entry, zone, fasce)
+        try:
+            start, field = valid_start(entry, zone, fasce, festivi)
+        except ValueError as exc:
+            annotate("error", f"Turno {event_id} saltato: {exc}")
+            errors.append(event_id)
+            continue
         previous = state["events"].get(event_id, {})
         status = previous.get("status")
         if previous and previous.get("operatore") != entry["operatore"]:
