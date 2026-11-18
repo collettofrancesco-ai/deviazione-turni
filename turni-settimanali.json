@@ -1,6 +1,6 @@
 {
   "timezone": "Europe/Rome",
-  "settimana": "2026-11-30/2026-12-06",
+  "settimana": "2026-11-09/2026-12-14",
   "turni": [
     {
       "data": "2026-11-09",
@@ -416,6 +416,101 @@
       "data": "2026-12-07",
       "fascia": "dom_notte",
       "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-12-07",
+      "fascia": "mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-12-07",
+      "fascia": "notte",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-12-07",
+      "fascia": "pomeriggio",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-12-08",
+      "fascia": "mattina",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-12-08",
+      "fascia": "pomeriggio",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-12-09",
+      "fascia": "mattina",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-12-09",
+      "fascia": "notte",
+      "operatore": "Ignazio"
+    },
+    {
+      "data": "2026-12-09",
+      "fascia": "pomeriggio",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-12-10",
+      "fascia": "mattina",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-12-10",
+      "fascia": "notte",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-12-10",
+      "fascia": "pomeriggio",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-12-11",
+      "fascia": "mattina",
+      "operatore": "Ambra"
+    },
+    {
+      "data": "2026-12-11",
+      "fascia": "notte",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-12-12",
+      "fascia": "we_notte",
+      "operatore": "Davide"
+    },
+    {
+      "data": "2026-12-12",
+      "fascia": "we_pom",
+      "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-12-12",
+      "fascia": "weekend",
+      "operatore": "Marilena"
+    },
+    {
+      "data": "2026-12-13",
+      "fascia": "dom_mattina",
+      "operatore": "Alessandro"
+    },
+    {
+      "data": "2026-12-13",
+      "fascia": "dom_pom",
+      "operatore": "Francesco"
+    },
+    {
+      "data": "2026-12-14",
+      "fascia": "dom_notte",
+      "operatore": "Ignazio"
     }
   ]
 }
