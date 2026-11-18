@@ -434,13 +434,18 @@
     },
     {
       "data": "2026-12-08",
-      "fascia": "mattina",
+      "fascia": "dom_mattina",
       "operatore": "Alessandro"
     },
     {
       "data": "2026-12-08",
-      "fascia": "pomeriggio",
+      "fascia": "dom_pom",
       "operatore": "Vincenzo"
+    },
+    {
+      "data": "2026-12-09",
+      "fascia": "dom_notte",
+      "operatore": "Francesco"
     },
     {
       "data": "2026-12-09",
