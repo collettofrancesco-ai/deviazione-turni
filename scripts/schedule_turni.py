@@ -113,6 +113,8 @@ def valid_start(entry, zone, valid_keys, festivi=frozenset()):
     allowed_days, start_time, field = SHIFT_RULES[key]
     if entry["data"] in festivi and key in ("dom_mattina", "dom_pom"):
         allowed_days = (day.weekday(),)
+    if key == "dom_notte" and (day - timedelta(days=1)).isoformat() in festivi:
+        allowed_days = (day.weekday(),)
     if day.weekday() not in allowed_days:
         raise ValueError(f"La fascia {key} non è prevista per la data {entry['data']}.")
     return datetime.combine(day, start_time, tzinfo=zone), field
