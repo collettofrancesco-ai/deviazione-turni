@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21T11:16:19+01:00",
+  "updated_at": "2026-11-21T17:15:59+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -304,6 +304,14 @@
       "campo": "WE_POMERIGGIO",
       "status": "verificata",
       "inviato_il": "2026-11-21T11:16:16+01:00"
+    },
+    "2026-11-21|we_notte": {
+      "data": "2026-11-21",
+      "fascia": "we_notte",
+      "operatore": "Nestore",
+      "campo": "WE_NOTTE",
+      "status": "verificata",
+      "inviato_il": "2026-11-21T17:15:57+01:00"
     }
   }
 }
