@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-22T05:15:44+01:00",
+  "updated_at": "2026-11-22T13:16:14+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -320,6 +320,14 @@
       "campo": "DOM_MATTINA",
       "status": "verificata",
       "inviato_il": "2026-11-22T05:15:42+01:00"
+    },
+    "2026-11-22|dom_pom": {
+      "data": "2026-11-22",
+      "fascia": "dom_pom",
+      "operatore": "Alessandro",
+      "campo": "DOM_POMERIGGIO",
+      "status": "verificata",
+      "inviato_il": "2026-11-22T13:16:12+01:00"
     }
   }
 }
