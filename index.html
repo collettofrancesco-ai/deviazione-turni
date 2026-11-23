@@ -86,11 +86,16 @@
   .piano-status{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);line-height:1.6}
 
   /* Pannello prossimi turni: solo su schermo largo, nello spazio libero a destra */
-  .prossimi{display:none}
+  .prossimi{position:fixed; right:16px; bottom:70px; width:280px; max-height:60vh; overflow:auto; z-index:50;
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px; font-size:13px;
+    box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  .prossimi.chiuso{display:none}
+  .pg-btn{position:fixed; right:16px; bottom:16px; z-index:51; background:var(--accent); color:#0d1117; border:0;
+    border-radius:20px; padding:10px 16px; font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; cursor:pointer}
   @media (min-width:1620px){
-    .prossimi{display:block; position:fixed; top:28px; right:20px; width:280px;
-      max-height:calc(100vh - 56px); overflow:auto; background:var(--panel); border:1px solid var(--line);
-      border-radius:8px; padding:16px; font-size:13px}
+    .prossimi{display:block; top:28px; bottom:auto; right:20px; max-height:calc(100vh - 56px)}
+    .prossimi.chiuso{display:block}
+    .pg-btn{display:none}
   }
   .prossimi h2{font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--dim); margin:0 0 12px; font-weight:600}
   .pg-giorno + .pg-giorno{margin-top:14px}
@@ -589,7 +594,8 @@ mostraEsitoAutomazione();
 </script>
 
 
-<aside class="prossimi" aria-label="Prossimi turni pianificati">
+<button type="button" class="pg-btn" id="pgBtn" aria-expanded="false" aria-controls="prossimi">Prossimi turni</button>
+<aside class="prossimi chiuso" id="prossimi" aria-label="Prossimi turni pianificati">
   <h2>Prossimi turni</h2>
   <div id="prossimiLista" role="status" aria-live="polite">Caricamento…</div>
   <div class="pg-nota">Dal piano settimanale. Il colore arancio indica oggi.</div>
@@ -604,6 +610,12 @@ mostraEsitoAutomazione();
     dom_mattina:"Dom mattina 08–16", dom_pom:"Dom pomeriggio 16–24", dom_notte:"Dom notte 00–08"
   };
   const lista = document.getElementById("prossimiLista");
+  const pannello = document.getElementById("prossimi");
+  const pulsante = document.getElementById("pgBtn");
+  pulsante.addEventListener("click", () => {
+    const aperto = pannello.classList.toggle("chiuso") === false;
+    pulsante.setAttribute("aria-expanded", aperto ? "true" : "false");
+  });
 
   function etichettaData(iso){
     const d = new Date(iso + "T12:00:00");
