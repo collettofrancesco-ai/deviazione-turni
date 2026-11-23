@@ -621,6 +621,16 @@
       "data": "2026-12-20",
       "fascia": "dom_mattina",
       "operatore": "Aldo"
+    },
+    {
+      "data": "2026-12-20",
+      "fascia": "dom_pom",
+      "operatore": "Roberta"
+    },
+    {
+      "data": "2026-12-21",
+      "fascia": "dom_notte",
+      "operatore": "Ambra"
     }
   ],
   "festivi": [
