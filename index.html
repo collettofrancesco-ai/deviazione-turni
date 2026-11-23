@@ -193,7 +193,7 @@ document.querySelector("details").addEventListener("toggle", e => {
 
 const operatoreImmediato = document.getElementById("operatoreImmediato");
 operatoreImmediato.innerHTML = '<option value="">&mdash; scegli operatore &mdash;</option>'
-  + Object.keys(PERSONE).map(n => '<option>' + n + '</option>').join("");
+  + Object.keys(PERSONE).sort((a, b) => a.localeCompare(b, "it")).map(n => '<option>' + n + '</option>').join("");
 
 function vai(url){ canale.src = url; }
 function dimmi(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
@@ -386,7 +386,7 @@ FASCE.forEach(f => {
 
   const sel = document.createElement("select");
   sel.innerHTML = '<option value="">&mdash; scegli &mdash;</option>'
-    + Object.keys(PERSONE).map(n => '<option>' + n + '</option>').join("");
+    + Object.keys(PERSONE).sort((a, b) => a.localeCompare(b, "it")).map(n => '<option>' + n + '</option>').join("");
 
   const b1 = document.createElement("button");
   b1.textContent = "Imposta";
