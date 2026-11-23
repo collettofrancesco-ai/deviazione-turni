@@ -85,33 +85,65 @@
   .piano-risultato.ok{color:var(--ok)} .piano-risultato.err{color:var(--warn)}
   .piano-status{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);line-height:1.6}
 
-  /* Pannello prossimi turni: solo su schermo largo, nello spazio libero a destra */
-  .prossimi{position:fixed; right:16px; bottom:70px; width:280px; max-height:60vh; overflow:auto; z-index:50;
-    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px; font-size:13px;
-    box-shadow:0 10px 30px rgba(0,0,0,.45)}
-  .prossimi.chiuso{display:none}
-  .pg-btn{position:fixed; right:16px; bottom:16px; z-index:51; background:var(--accent); color:#0d1117; border:0;
-    border-radius:20px; padding:10px 16px; font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; cursor:pointer}
-  @media (min-width:1620px){
-    .prossimi{display:block; top:28px; bottom:auto; right:20px; max-height:calc(100vh - 56px)}
-    .prossimi.chiuso{display:block}
-    .pg-btn{display:none}
+  .testata{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap}
+  .turni-btn{display:inline-flex; align-items:center; gap:8px; margin-top:2px; background:linear-gradient(135deg,#1f6feb,#58a6ff);
+    color:#fff; border:0; border-radius:999px; padding:9px 16px 9px 13px; font:600 13px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    cursor:pointer; box-shadow:0 6px 18px rgba(88,166,255,.22); transition:transform .15s, box-shadow .15s}
+  .turni-btn:hover{transform:translateY(-1px); box-shadow:0 10px 26px rgba(88,166,255,.35)}
+  .turni-btn:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+  .turni-btn svg{width:16px; height:16px; flex:none}
+
+  dialog.turni-modal{margin:auto; width:min(980px, calc(100vw - 24px)); max-height:calc(100vh - 32px); overflow:auto;
+    padding:0; border:1px solid var(--line); border-radius:14px; background:var(--panel); color:var(--txt);
+    box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  dialog.turni-modal::backdrop{background:rgba(1,4,9,.72); backdrop-filter:blur(3px)}
+  dialog.turni-modal[open]{animation:tmSali .22s ease-out}
+  @keyframes tmSali{from{opacity:0; transform:translateY(10px) scale(.985)} to{opacity:1; transform:none}}
+  .tm-head{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 22px; border-bottom:1px solid var(--line)}
+  .tm-head h2{font-size:17px; margin:0; font-weight:600; letter-spacing:0}
+  .tm-head small{display:block; color:var(--dim); font-size:12px; margin-top:3px}
+  .tm-nav{display:flex; gap:6px; align-items:center}
+  .tm-nav button{background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:8px;
+    width:34px; height:34px; cursor:pointer; font-size:18px; line-height:1; padding:0}
+  .tm-nav button:hover{border-color:var(--accent); color:var(--accent)}
+  .tm-nav button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .tm-corpo{padding:18px 22px 22px}
+  .tm-msg{color:var(--dim); font-size:14px; padding:24px 0; text-align:center}
+  .tm-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px}
+  .tm-giorno{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:11px; min-width:0}
+  .tm-giorno.oggi{border-color:var(--live); box-shadow:inset 0 0 0 1px var(--live)}
+  .tm-testa{padding-bottom:9px; margin-bottom:4px; border-bottom:1px solid var(--line)}
+  .tm-nome{font-size:11px; text-transform:uppercase; letter-spacing:.8px; color:var(--dim)}
+  .tm-data{font-size:17px; font-weight:600; margin-top:2px; display:flex; align-items:center; gap:7px; white-space:nowrap}
+  .tm-giorno.oggi .tm-data{color:var(--live)}
+  .tm-tag{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; background:var(--live); color:#0d1117; border-radius:999px; padding:2px 7px}
+  .tm-slot{padding:8px 0; border-top:1px solid rgba(48,54,61,.6)}
+  .tm-slot:first-of-type{border-top:0}
+  .tm-orario{font-size:11px; color:var(--dim); line-height:1.35}
+  .tm-op{font-size:14px; font-weight:600; margin-top:2px; overflow-wrap:anywhere}
+  .tm-op.vuoto{color:var(--dim); font-weight:400; font-style:italic}
+  @media (max-width:820px){
+    .tm-corpo{padding:14px}
+    .tm-head{padding:14px 16px}
+    .tm-grid{grid-template-columns:1fr; gap:8px}
+    .tm-giorno{padding:10px 12px}
+    .tm-slot{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:7px 0}
+    .tm-op{margin-top:0; text-align:right}
   }
-  .prossimi h2{font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--dim); margin:0 0 12px; font-weight:600}
-  .pg-giorno + .pg-giorno{margin-top:14px}
-  .pg-data{color:var(--accent); font-weight:600; font-size:13px; margin-bottom:4px; padding-bottom:4px; border-bottom:1px solid var(--line)}
-  .pg-data.oggi{color:var(--live)}
-  .pg-riga{display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:3px 0}
-  .pg-fascia{color:var(--dim); font-size:12px; white-space:nowrap}
-  .pg-op{font-weight:600; text-align:right}
-  .pg-vuoto{color:var(--dim); font-size:12px; line-height:1.5}
-  .pg-nota{color:var(--dim); font-size:11px; margin-top:12px; line-height:1.5}
 </style>
 </head>
 <body>
 
-<h1>Deviazione chiamate</h1>
-<div class="sub">Helpdesk &middot; comandi e verifica via MacroDroid cloud &mdash; funziona da qualsiasi rete</div>
+<div class="testata">
+  <div>
+    <h1>Deviazione chiamate</h1>
+    <div class="sub">Helpdesk &middot; comandi e verifica via MacroDroid cloud &mdash; funziona da qualsiasi rete</div>
+  </div>
+  <button type="button" class="turni-btn" id="apriTurni" aria-haspopup="dialog" aria-controls="modalTurni">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Prossimi turni
+  </button>
+</div>
 
 <div class="card">
   <div class="lbl">Situazione reale sul telefono</div>
@@ -594,70 +626,70 @@ mostraEsitoAutomazione();
 </script>
 
 
-<button type="button" class="pg-btn" id="pgBtn" aria-expanded="false" aria-controls="prossimi">Prossimi turni</button>
-<aside class="prossimi chiuso" id="prossimi" aria-label="Prossimi turni pianificati">
-  <h2>Prossimi turni</h2>
-  <div id="prossimiLista" role="status" aria-live="polite">Caricamento…</div>
-  <div class="pg-nota">Dal piano settimanale. Il colore arancio indica oggi.</div>
-</aside>
+<dialog class="turni-modal" id="modalTurni" aria-labelledby="tmTitolo">
+  <div class="tm-head">
+    <div>
+      <h2 id="tmTitolo">Turni della settimana</h2>
+      <small>Piano settimanale · fasce orarie</small>
+    </div>
+    <div class="tm-nav">
+      <button type="button" id="tmPrec" aria-label="Settimana precedente">&lsaquo;</button>
+      <button type="button" id="tmSucc" aria-label="Settimana successiva">&rsaquo;</button>
+      <button type="button" id="tmChiudi" aria-label="Chiudi">&times;</button>
+    </div>
+  </div>
+  <div id="tmCorpo" class="tm-corpo" aria-live="polite"></div>
+</dialog>
 
 <script>
 (function(){
-  const ORDINE = ["mattina","pomeriggio","notte","weekend","we_pom","we_notte","dom_mattina","dom_pom","dom_notte"];
+  const ROMA = {timeZone:"Europe/Rome"};
+  const SLOT_FERIALE = ["mattina","pomeriggio","notte"];
+  const SLOT_SABATO  = ["weekend","we_pom","we_notte"];
+  const SLOT_DOMENICA = ["dom_mattina","dom_pom"];
   const ETICHETTA = {
-    mattina:"Mattina 09–15", pomeriggio:"Pomeriggio 15–22", notte:"Notte 22–09",
-    weekend:"Sab mattina 08–14", we_pom:"Sab pomeriggio 14–20", we_notte:"Sab notte 20–08",
-    dom_mattina:"Dom mattina 08–16", dom_pom:"Dom pomeriggio 16–24", dom_notte:"Dom notte 00–08"
+    mattina:"Mattina", pomeriggio:"Pomeriggio / Sera", notte:"Notte",
+    weekend:"Mattina", we_pom:"Pomeriggio", we_notte:"Notte",
+    dom_mattina:"Mattina", dom_pom:"Pomeriggio", dom_notte:"Notte"
   };
-  const lista = document.getElementById("prossimiLista");
-  const pannello = document.getElementById("prossimi");
-  const pulsante = document.getElementById("pgBtn");
-  pulsante.addEventListener("click", () => {
-    const aperto = pannello.classList.toggle("chiuso") === false;
-    pulsante.setAttribute("aria-expanded", aperto ? "true" : "false");
-  });
+  const ORARIO = {
+    mattina:"09–15", pomeriggio:"15–22", notte:"22–09",
+    weekend:"08–14", we_pom:"14–20", we_notte:"20–08",
+    dom_mattina:"08–16", dom_pom:"16–24", dom_notte:"00–08"
+  };
 
-  function etichettaData(iso){
-    const d = new Date(iso + "T12:00:00");
-    const t = d.toLocaleDateString("it-IT", {weekday:"long", day:"numeric", month:"short", timeZone:"Europe/Rome"});
-    return t.charAt(0).toUpperCase() + t.slice(1);
-  }
+  const btn = document.getElementById("apriTurni");
+  const modal = document.getElementById("modalTurni");
+  const corpo = document.getElementById("tmCorpo");
+  const titolo = document.getElementById("tmTitolo");
+  const btnPrec = document.getElementById("tmPrec");
+  const btnSucc = document.getElementById("tmSucc");
+  const btnChiudi = document.getElementById("tmChiudi");
 
-  function disegna(turni, oggi){
-    lista.textContent = "";
-    if(!turni.length){
-      const v = document.createElement("div");
-      v.className = "pg-vuoto";
-      v.textContent = "Nessun turno pianificato nei prossimi giorni.";
-      lista.appendChild(v);
-      return;
+  let mappa = {}, festivi = new Set(), caricato = false, errore = false;
+  let lunedi = "";
+  const oggi = new Date().toLocaleDateString("sv-SE", ROMA);
+
+  function dataDi(iso){ return new Date(iso + "T12:00:00"); }
+  function aggiungi(iso, n){ const d = dataDi(iso); d.setDate(d.getDate() + n); return d.toLocaleDateString("sv-SE"); }
+  function lunediDi(iso){ const g = (dataDi(iso).getDay() + 6) % 7; return aggiungi(iso, -g); }
+  function domenicale(iso){ return festivi.has(iso) || dataDi(iso).getDay() === 0; }
+  function capitalizza(t){ return t.charAt(0).toUpperCase() + t.slice(1); }
+  function fmtLungo(iso){ return dataDi(iso).toLocaleDateString("it-IT", {day:"numeric", month:"long", year:"numeric"}); }
+  function fmtBreve(iso){ return dataDi(iso).toLocaleDateString("it-IT", {day:"numeric", month:"short"}); }
+
+  function righeGiorno(iso){
+    let chiavi;
+    if(domenicale(iso)) chiavi = SLOT_DOMENICA;
+    else if(dataDi(iso).getDay() === 6) chiavi = SLOT_SABATO;
+    else chiavi = SLOT_FERIALE;
+    const righe = chiavi.map(f => ({fascia:f, operatore: mappa[iso + "|" + f] || ""}));
+    if(domenicale(iso)){
+      // La notte di domenica/festivo è registrata con la data del giorno successivo (00:00-08:00)
+      const dopo = aggiungi(iso, 1);
+      righe.push({fascia:"dom_notte", operatore: mappa[dopo + "|dom_notte"] || "", lunedi:true});
     }
-    const giorni = {};
-    turni.forEach(t => { (giorni[t.data] = giorni[t.data] || []).push(t); });
-    Object.keys(giorni).sort().slice(0, 7).forEach(data => {
-      const blocco = document.createElement("div");
-      blocco.className = "pg-giorno";
-      const titolo = document.createElement("div");
-      titolo.className = "pg-data" + (data === oggi ? " oggi" : "");
-      titolo.textContent = etichettaData(data) + (data === oggi ? " · oggi" : "");
-      blocco.appendChild(titolo);
-      giorni[data]
-        .sort((a, b) => ORDINE.indexOf(a.fascia) - ORDINE.indexOf(b.fascia))
-        .forEach(t => {
-          const riga = document.createElement("div");
-          riga.className = "pg-riga";
-          const f = document.createElement("span");
-          f.className = "pg-fascia";
-          f.textContent = ETICHETTA[t.fascia] || t.fascia;
-          const o = document.createElement("span");
-          o.className = "pg-op";
-          o.textContent = t.operatore || "—";
-          riga.appendChild(f);
-          riga.appendChild(o);
-          blocco.appendChild(riga);
-        });
-      lista.appendChild(blocco);
-    });
+    return righe;
   }
 
   async function carica(){
@@ -666,16 +698,87 @@ mostraEsitoAutomazione();
       if(!r.ok) throw new Error("HTTP " + r.status);
       const pj = await r.json();
       const tutti = Array.isArray(pj) ? pj : (pj.turni || pj.assegnazioni || []);
-      const oggi = new Date().toLocaleDateString("sv-SE", {timeZone:"Europe/Rome"});
-      const futuri = tutti.filter(e => e.data >= oggi && e.operatore);
-      disegna(futuri, oggi);
+      mappa = {};
+      tutti.forEach(e => {
+        if(e.data && e.fascia && e.operatore){
+          const k = e.data + "|" + e.fascia;
+          if(!mappa[k]) mappa[k] = e.operatore;
+        }
+      });
+      festivi = new Set(Array.isArray(pj.festivi) ? pj.festivi : []);
+      caricato = true; errore = false;
     }catch(_){
-      lista.textContent = "Piano non disponibile in questo momento.";
+      errore = true;
     }
   }
 
-  carica();
-  setInterval(carica, 10 * 60 * 1000);
+  function render(){
+    titolo.textContent = "Dal " + fmtBreve(lunedi) + " al " + fmtLungo(aggiungi(lunedi, 6));
+    corpo.textContent = "";
+    if(!caricato){
+      const m = document.createElement("div");
+      m.className = "tm-msg";
+      m.textContent = errore ? "Piano non disponibile in questo momento." : "Caricamento…";
+      corpo.appendChild(m);
+      return;
+    }
+    const grid = document.createElement("div");
+    grid.className = "tm-grid";
+    for(let i = 0; i < 7; i++){
+      const iso = aggiungi(lunedi, i);
+      const card = document.createElement("div");
+      card.className = "tm-giorno" + (iso === oggi ? " oggi" : "");
+
+      const testa = document.createElement("div");
+      testa.className = "tm-testa";
+      const nome = document.createElement("div");
+      nome.className = "tm-nome";
+      nome.textContent = capitalizza(dataDi(iso).toLocaleDateString("it-IT", {weekday:"long"})) + (festivi.has(iso) ? " · festivo" : "");
+      const data = document.createElement("div");
+      data.className = "tm-data";
+      data.textContent = fmtBreve(iso);
+      if(iso === oggi){
+        const tag = document.createElement("span");
+        tag.className = "tm-tag";
+        tag.textContent = "oggi";
+        data.appendChild(tag);
+      }
+      testa.appendChild(nome);
+      testa.appendChild(data);
+      card.appendChild(testa);
+
+      righeGiorno(iso).forEach(r => {
+        const slot = document.createElement("div");
+        slot.className = "tm-slot";
+        const etich = document.createElement("div");
+        etich.className = "tm-orario";
+        etich.textContent = ETICHETTA[r.fascia] + " · " + ORARIO[r.fascia] + (r.lunedi ? " (lunedì)" : "");
+        const op = document.createElement("div");
+        op.className = "tm-op" + (r.operatore ? "" : " vuoto");
+        op.textContent = r.operatore || "da assegnare";
+        slot.appendChild(etich);
+        slot.appendChild(op);
+        card.appendChild(slot);
+      });
+      grid.appendChild(card);
+    }
+    corpo.appendChild(grid);
+  }
+
+  async function apri(){
+    lunedi = lunediDi(oggi);
+    if(!modal.open) modal.showModal();
+    corpo.textContent = "";
+    render();
+    await carica();
+    render();
+  }
+
+  btn.addEventListener("click", apri);
+  btnPrec.addEventListener("click", () => { lunedi = aggiungi(lunedi, -7); render(); });
+  btnSucc.addEventListener("click", () => { lunedi = aggiungi(lunedi, 7); render(); });
+  btnChiudi.addEventListener("click", () => modal.close());
+  modal.addEventListener("click", e => { if(e.target === modal) modal.close(); });
 })();
 </script>
 
