@@ -84,6 +84,23 @@
   .piano-risultato{font-size:13px;margin-top:10px;line-height:1.5}
   .piano-risultato.ok{color:var(--ok)} .piano-risultato.err{color:var(--warn)}
   .piano-status{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);line-height:1.6}
+
+  /* Pannello prossimi turni: solo su schermo largo, nello spazio libero a destra */
+  .prossimi{display:none}
+  @media (min-width:1620px){
+    .prossimi{display:block; position:fixed; top:28px; right:20px; width:280px;
+      max-height:calc(100vh - 56px); overflow:auto; background:var(--panel); border:1px solid var(--line);
+      border-radius:8px; padding:16px; font-size:13px}
+  }
+  .prossimi h2{font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--dim); margin:0 0 12px; font-weight:600}
+  .pg-giorno + .pg-giorno{margin-top:14px}
+  .pg-data{color:var(--accent); font-weight:600; font-size:13px; margin-bottom:4px; padding-bottom:4px; border-bottom:1px solid var(--line)}
+  .pg-data.oggi{color:var(--live)}
+  .pg-riga{display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:3px 0}
+  .pg-fascia{color:var(--dim); font-size:12px; white-space:nowrap}
+  .pg-op{font-weight:600; text-align:right}
+  .pg-vuoto{color:var(--dim); font-size:12px; line-height:1.5}
+  .pg-nota{color:var(--dim); font-size:11px; margin-top:12px; line-height:1.5}
 </style>
 </head>
 <body>
@@ -569,6 +586,85 @@ function eventosParaMostrar(eventi){
 }
 mostraEsitoAutomazione();
 
+</script>
+
+
+<aside class="prossimi" aria-label="Prossimi turni pianificati">
+  <h2>Prossimi turni</h2>
+  <div id="prossimiLista" role="status" aria-live="polite">Caricamento…</div>
+  <div class="pg-nota">Dal piano settimanale. Il colore arancio indica oggi.</div>
+</aside>
+
+<script>
+(function(){
+  const ORDINE = ["mattina","pomeriggio","notte","weekend","we_pom","we_notte","dom_mattina","dom_pom","dom_notte"];
+  const ETICHETTA = {
+    mattina:"Mattina 09–15", pomeriggio:"Pomeriggio 15–22", notte:"Notte 22–09",
+    weekend:"Sab mattina 08–14", we_pom:"Sab pomeriggio 14–20", we_notte:"Sab notte 20–08",
+    dom_mattina:"Dom mattina 08–16", dom_pom:"Dom pomeriggio 16–24", dom_notte:"Dom notte 00–08"
+  };
+  const lista = document.getElementById("prossimiLista");
+
+  function etichettaData(iso){
+    const d = new Date(iso + "T12:00:00");
+    const t = d.toLocaleDateString("it-IT", {weekday:"long", day:"numeric", month:"short", timeZone:"Europe/Rome"});
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  function disegna(turni, oggi){
+    lista.textContent = "";
+    if(!turni.length){
+      const v = document.createElement("div");
+      v.className = "pg-vuoto";
+      v.textContent = "Nessun turno pianificato nei prossimi giorni.";
+      lista.appendChild(v);
+      return;
+    }
+    const giorni = {};
+    turni.forEach(t => { (giorni[t.data] = giorni[t.data] || []).push(t); });
+    Object.keys(giorni).sort().slice(0, 7).forEach(data => {
+      const blocco = document.createElement("div");
+      blocco.className = "pg-giorno";
+      const titolo = document.createElement("div");
+      titolo.className = "pg-data" + (data === oggi ? " oggi" : "");
+      titolo.textContent = etichettaData(data) + (data === oggi ? " · oggi" : "");
+      blocco.appendChild(titolo);
+      giorni[data]
+        .sort((a, b) => ORDINE.indexOf(a.fascia) - ORDINE.indexOf(b.fascia))
+        .forEach(t => {
+          const riga = document.createElement("div");
+          riga.className = "pg-riga";
+          const f = document.createElement("span");
+          f.className = "pg-fascia";
+          f.textContent = ETICHETTA[t.fascia] || t.fascia;
+          const o = document.createElement("span");
+          o.className = "pg-op";
+          o.textContent = t.operatore || "—";
+          riga.appendChild(f);
+          riga.appendChild(o);
+          blocco.appendChild(riga);
+        });
+      lista.appendChild(blocco);
+    });
+  }
+
+  async function carica(){
+    try{
+      const r = await fetch("turni-settimanali.json?_=" + Date.now(), {cache:"no-store"});
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      const pj = await r.json();
+      const tutti = Array.isArray(pj) ? pj : (pj.turni || pj.assegnazioni || []);
+      const oggi = new Date().toLocaleDateString("sv-SE", {timeZone:"Europe/Rome"});
+      const futuri = tutti.filter(e => e.data >= oggi && e.operatore);
+      disegna(futuri, oggi);
+    }catch(_){
+      lista.textContent = "Piano non disponibile in questo momento.";
+    }
+  }
+
+  carica();
+  setInterval(carica, 10 * 60 * 1000);
+})();
 </script>
 
 </body>
