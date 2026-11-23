@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-23T06:16:18+01:00",
+  "updated_at": "2026-11-23T12:05:40+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -344,6 +344,14 @@
       "campo": "MATTINA",
       "status": "verificata",
       "inviato_il": "2026-11-23T06:16:17+01:00"
+    },
+    "2026-11-23|pomeriggio": {
+      "data": "2026-11-23",
+      "fascia": "pomeriggio",
+      "operatore": "Marilena",
+      "campo": "POMERIGGIO",
+      "status": "verificata",
+      "inviato_il": "2026-11-23T12:05:38+01:00"
     }
   }
 }
