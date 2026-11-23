@@ -130,6 +130,34 @@
     .tm-slot{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:7px 0}
     .tm-op{margin-top:0; text-align:right}
   }
+  .tm-edit-btn{height:34px; padding:0 12px; border-radius:8px; border:1px solid var(--line); background:var(--panel2);
+    color:var(--txt); font:600 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; cursor:pointer}
+  .tm-edit-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .tm-nav .tm-edit-btn{width:auto; height:34px; font-size:13px; padding:0 12px; white-space:nowrap}
+  .tm-edit-btn[aria-pressed="true"]{background:var(--live); border-color:var(--live); color:#0d1117}
+  .tm-edit-btn:focus-visible,.tm-barra button:focus-visible,.tm-barra a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .tm-op-btn{display:block; width:100%; text-align:left; margin-top:3px; background:transparent; color:var(--txt);
+    border:1px dashed var(--line); border-radius:6px; padding:5px 7px; font:600 14px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; cursor:pointer}
+  .tm-op-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .tm-op-btn.vuoto{color:var(--dim); font-weight:400; font-style:italic}
+  .tm-giorno.bozza .tm-testa{border-bottom-color:var(--live)}
+  .tm-sel{width:100%; margin-top:4px; background:var(--bg); color:var(--txt); border:1px solid var(--accent); border-radius:6px; padding:6px; font-size:14px}
+  .tm-azioni{display:flex; gap:6px; margin-top:6px}
+  .tm-azioni button{flex:1; border-radius:6px; border:1px solid var(--line); background:var(--panel2); color:var(--txt); padding:6px 8px; font-size:12px; cursor:pointer}
+  .tm-azioni button.ok{background:var(--accent); border-color:var(--accent); color:#0d1117; font-weight:600}
+  .tm-barra{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:12px 22px;
+    border-top:1px solid var(--line); background:var(--panel2); font-size:13px}
+  .tm-barra[hidden]{display:none}
+  .tm-barra-testo{color:var(--dim)}
+  .tm-barra-testo b{color:var(--live)}
+  .tm-barra-azioni{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .tm-barra-azioni button,.tm-barra-azioni a{border-radius:7px; border:1px solid var(--line); background:var(--panel); color:var(--txt);
+    padding:7px 11px; font-size:12px; text-decoration:none; cursor:pointer}
+  .tm-barra-azioni a.ok,.tm-barra-azioni button.ok{background:var(--accent); border-color:var(--accent); color:#0d1117; font-weight:600}
+  @media (max-width:820px){
+    .tm-barra{padding:12px 16px}
+    .tm-op-btn{text-align:left}
+  }
 </style>
 </head>
 <body>
@@ -633,19 +661,30 @@ mostraEsitoAutomazione();
       <small>Piano settimanale · fasce orarie</small>
     </div>
     <div class="tm-nav">
+      <button type="button" id="tmModifica" class="tm-edit-btn" aria-pressed="false">Modifica</button>
       <button type="button" id="tmPrec" aria-label="Settimana precedente">&lsaquo;</button>
       <button type="button" id="tmSucc" aria-label="Settimana successiva">&rsaquo;</button>
       <button type="button" id="tmChiudi" aria-label="Chiudi">&times;</button>
     </div>
   </div>
   <div id="tmCorpo" class="tm-corpo" aria-live="polite"></div>
+  <div id="tmBarra" class="tm-barra" hidden>
+    <span id="tmBarraTesto" class="tm-barra-testo"></span>
+    <div class="tm-barra-azioni">
+      <button type="button" id="tmCopia" class="ok">Copia JSON</button>
+      <a id="tmGit" href="https://github.com/collettofrancesco-ai/deviazione-turni/edit/gh-pages/turni-settimanali.json" target="_blank" rel="noopener">Apri GitHub</a>
+      <button type="button" id="tmScarta">Scarta modifiche</button>
+    </div>
+  </div>
 </dialog>
 
 <script>
 (function(){
   const ROMA = {timeZone:"Europe/Rome"};
+  const CHIAVE_BOZZA = "turni_bozza_v1";
+  const ORDINE = ["mattina","pomeriggio","notte","weekend","we_pom","we_notte","dom_mattina","dom_pom","dom_notte"];
   const SLOT_FERIALE = ["mattina","pomeriggio","notte"];
-  const SLOT_SABATO  = ["weekend","we_pom","we_notte"];
+  const SLOT_SABATO = ["weekend","we_pom","we_notte"];
   const SLOT_DOMENICA = ["dom_mattina","dom_pom"];
   const ETICHETTA = {
     mattina:"Mattina", pomeriggio:"Pomeriggio / Sera", notte:"Notte",
@@ -657,6 +696,7 @@ mostraEsitoAutomazione();
     weekend:"08–14", we_pom:"14–20", we_notte:"20–08",
     dom_mattina:"08–16", dom_pom:"16–24", dom_notte:"00–08"
   };
+  const URL_GITHUB = "https://github.com/collettofrancesco-ai/deviazione-turni/edit/gh-pages/turni-settimanali.json";
 
   const btn = document.getElementById("apriTurni");
   const modal = document.getElementById("modalTurni");
@@ -665,10 +705,20 @@ mostraEsitoAutomazione();
   const btnPrec = document.getElementById("tmPrec");
   const btnSucc = document.getElementById("tmSucc");
   const btnChiudi = document.getElementById("tmChiudi");
+  const btnModifica = document.getElementById("tmModifica");
+  const barra = document.getElementById("tmBarra");
+  const barraTesto = document.getElementById("tmBarraTesto");
+  const btnCopia = document.getElementById("tmCopia");
+  const btnScarta = document.getElementById("tmScarta");
 
-  let mappa = {}, festivi = new Set(), caricato = false, errore = false;
-  let lunedi = "";
   const oggi = new Date().toLocaleDateString("sv-SE", ROMA);
+  let originale = null;      // JSON così come pubblicato
+  let base = [];             // lista pubblicata
+  let piano = [];            // lista corrente (pubblicata + bozza)
+  let festivi = new Set();
+  let caricato = false, errore = false, modifica = false;
+  let lunedi = "";
+  let aperto = null;         // slot in modifica: {data, fascia}
 
   function dataDi(iso){ return new Date(iso + "T12:00:00"); }
   function aggiungi(iso, n){ const d = dataDi(iso); d.setDate(d.getDate() + n); return d.toLocaleDateString("sv-SE"); }
@@ -677,51 +727,131 @@ mostraEsitoAutomazione();
   function capitalizza(t){ return t.charAt(0).toUpperCase() + t.slice(1); }
   function fmtLungo(iso){ return dataDi(iso).toLocaleDateString("it-IT", {day:"numeric", month:"long", year:"numeric"}); }
   function fmtBreve(iso){ return dataDi(iso).toLocaleDateString("it-IT", {day:"numeric", month:"short"}); }
+  function listaDi(pj){ return Array.isArray(pj) ? pj : (pj.turni || pj.assegnazioni || []); }
+  function ordina(l){ l.sort((a,b) => a.data.localeCompare(b.data) || ORDINE.indexOf(a.fascia) - ORDINE.indexOf(b.fascia)); return l; }
+  function chiaveNorm(l){ return l.map(e => e.data + "|" + e.fascia + "|" + e.operatore).sort().join("\n"); }
 
-  function righeGiorno(iso){
-    let chiavi;
-    if(domenicale(iso)) chiavi = SLOT_DOMENICA;
-    else if(dataDi(iso).getDay() === 6) chiavi = SLOT_SABATO;
-    else chiavi = SLOT_FERIALE;
-    const righe = chiavi.map(f => ({fascia:f, operatore: mappa[iso + "|" + f] || ""}));
-    if(domenicale(iso)){
-      // La notte di domenica/festivo è registrata con la data del giorno successivo (00:00-08:00)
-      const dopo = aggiungi(iso, 1);
-      righe.push({fascia:"dom_notte", operatore: mappa[dopo + "|dom_notte"] || "", lunedi:true});
-    }
-    return righe;
+  function mappaDi(l){
+    const m = {};
+    l.forEach(e => { const k = e.data + "|" + e.fascia; if(!m[k]) m[k] = e.operatore; });
+    return m;
   }
 
-  async function carica(){
+  // Bozza locale: modifiche non ancora pubblicate, salvate solo in questo browser
+  function leggiBozza(){
+    try{ const v = localStorage.getItem(CHIAVE_BOZZA); return v ? JSON.parse(v) : null; }catch(_){ return null; }
+  }
+  function salvaBozza(){
+    try{ localStorage.setItem(CHIAVE_BOZZA, JSON.stringify(piano)); }catch(_){}
+  }
+  function cancellaBozza(){
+    try{ localStorage.removeItem(CHIAVE_BOZZA); }catch(_){}
+  }
+
+  function differenze(){
+    const mb = mappaDi(base), mp = mappaDi(piano);
+    const chiavi = new Set([...Object.keys(mb), ...Object.keys(mp)]);
+    let n = 0;
+    chiavi.forEach(k => { if((mb[k] || "") !== (mp[k] || "")) n++; });
+    return n;
+  }
+
+  function jsonDaPubblicare(){
+    const lista = ordina(piano.map(e => ({...e})));
+    if(Array.isArray(originale)) return JSON.stringify(lista, null, 2);
+    return JSON.stringify({...originale, turni: lista}, null, 2);
+  }
+
+  async function caricaPiano(){
     try{
       const r = await fetch("turni-settimanali.json?_=" + Date.now(), {cache:"no-store"});
       if(!r.ok) throw new Error("HTTP " + r.status);
       const pj = await r.json();
-      const tutti = Array.isArray(pj) ? pj : (pj.turni || pj.assegnazioni || []);
-      mappa = {};
-      tutti.forEach(e => {
-        if(e.data && e.fascia && e.operatore){
-          const k = e.data + "|" + e.fascia;
-          if(!mappa[k]) mappa[k] = e.operatore;
-        }
-      });
+      originale = pj;
+      base = ordina(listaDi(pj).filter(e => e.data && e.fascia && e.operatore).map(e => ({...e})));
       festivi = new Set(Array.isArray(pj.festivi) ? pj.festivi : []);
+      const bozza = leggiBozza();
+      piano = bozza ? bozza.map(e => ({...e})) : base.map(e => ({...e}));
+      if(bozza && chiaveNorm(bozza) === chiaveNorm(base)) cancellaBozza();
       caricato = true; errore = false;
     }catch(_){
       errore = true;
     }
   }
 
+  function righeGiorno(iso, m){
+    let chiavi;
+    if(domenicale(iso)) chiavi = SLOT_DOMENICA;
+    else if(dataDi(iso).getDay() === 6) chiavi = SLOT_SABATO;
+    else chiavi = SLOT_FERIALE;
+    const righe = chiavi.map(f => ({fascia:f, data:iso, operatore: m[iso + "|" + f] || ""}));
+    if(domenicale(iso)){
+      // La notte di domenica/festivo è registrata con la data del giorno successivo (00:00-08:00)
+      const dopo = aggiungi(iso, 1);
+      righe.push({fascia:"dom_notte", data:dopo, operatore: m[dopo + "|dom_notte"] || "", lunedi:true});
+    }
+    return righe;
+  }
+
+  function imposta(data, fascia, operatore){
+    const i = piano.findIndex(e => e.data === data && e.fascia === fascia);
+    if(!operatore){
+      if(i >= 0) piano.splice(i, 1);
+    } else if(i >= 0){
+      piano[i].operatore = operatore;
+    } else {
+      piano.push({data, fascia, operatore});
+    }
+    ordina(piano);
+    salvaBozza();
+    aperto = null;
+    render();
+  }
+
+  function creaSelect(data, fascia, attuale){
+    const box = document.createElement("div");
+    const sel = document.createElement("select");
+    sel.className = "tm-sel";
+    sel.setAttribute("aria-label", "Operatore per " + fascia + " del " + data);
+    const vuoto = document.createElement("option");
+    vuoto.value = ""; vuoto.textContent = "— nessuno —";
+    sel.appendChild(vuoto);
+    Object.keys(PERSONE).sort((a, b) => a.localeCompare(b, "it")).forEach(n => {
+      const o = document.createElement("option");
+      o.value = n; o.textContent = n;
+      sel.appendChild(o);
+    });
+    sel.value = attuale || "";
+    const azioni = document.createElement("div");
+    azioni.className = "tm-azioni";
+    const annulla = document.createElement("button");
+    annulla.type = "button"; annulla.textContent = "Annulla";
+    annulla.addEventListener("click", () => { aperto = null; render(); });
+    const salva = document.createElement("button");
+    salva.type = "button"; salva.className = "ok"; salva.textContent = "Salva";
+    salva.addEventListener("click", () => imposta(data, fascia, sel.value));
+    azioni.appendChild(annulla);
+    azioni.appendChild(salva);
+    box.appendChild(sel);
+    box.appendChild(azioni);
+    setTimeout(() => sel.focus(), 0);
+    return box;
+  }
+
   function render(){
     titolo.textContent = "Dal " + fmtBreve(lunedi) + " al " + fmtLungo(aggiungi(lunedi, 6));
+    btnModifica.setAttribute("aria-pressed", modifica ? "true" : "false");
+    btnModifica.textContent = modifica ? "Fine modifica" : "Modifica";
     corpo.textContent = "";
     if(!caricato){
       const m = document.createElement("div");
       m.className = "tm-msg";
       m.textContent = errore ? "Piano non disponibile in questo momento." : "Caricamento…";
       corpo.appendChild(m);
+      barra.hidden = true;
       return;
     }
+    const mappa = mappaDi(piano);
     const grid = document.createElement("div");
     grid.className = "tm-grid";
     for(let i = 0; i < 7; i++){
@@ -747,38 +877,75 @@ mostraEsitoAutomazione();
       testa.appendChild(data);
       card.appendChild(testa);
 
-      righeGiorno(iso).forEach(r => {
+      righeGiorno(iso, mappa).forEach(r => {
         const slot = document.createElement("div");
         slot.className = "tm-slot";
         const etich = document.createElement("div");
         etich.className = "tm-orario";
         etich.textContent = ETICHETTA[r.fascia] + " · " + ORARIO[r.fascia] + (r.lunedi ? " (lunedì)" : "");
-        const op = document.createElement("div");
-        op.className = "tm-op" + (r.operatore ? "" : " vuoto");
-        op.textContent = r.operatore || "da assegnare";
         slot.appendChild(etich);
-        slot.appendChild(op);
+
+        const inModifica = aperto && aperto.data === r.data && aperto.fascia === r.fascia;
+        if(modifica && inModifica){
+          slot.appendChild(creaSelect(r.data, r.fascia, r.operatore));
+        } else if(modifica){
+          const op = document.createElement("button");
+          op.type = "button";
+          op.className = "tm-op-btn" + (r.operatore ? "" : " vuoto");
+          op.textContent = r.operatore || "+ assegna";
+          op.setAttribute("aria-label", "Modifica " + ETICHETTA[r.fascia] + " del " + r.data + ": " + (r.operatore || "da assegnare"));
+          op.addEventListener("click", () => { aperto = {data:r.data, fascia:r.fascia}; render(); });
+          slot.appendChild(op);
+        } else {
+          const op = document.createElement("div");
+          op.className = "tm-op" + (r.operatore ? "" : " vuoto");
+          op.textContent = r.operatore || "da assegnare";
+          slot.appendChild(op);
+        }
         card.appendChild(slot);
       });
       grid.appendChild(card);
     }
     corpo.appendChild(grid);
+
+    const n = differenze();
+    barra.hidden = n === 0;
+    if(n > 0){
+      barraTesto.innerHTML = "<b>" + n + "</b> " + (n === 1 ? "modifica non pubblicata" : "modifiche non pubblicate") + " · copia il JSON e pubblicalo su GitHub";
+    }
   }
 
   async function apri(){
     lunedi = lunediDi(oggi);
+    aperto = null;
     if(!modal.open) modal.showModal();
-    corpo.textContent = "";
     render();
-    await carica();
+    await caricaPiano();
     render();
   }
 
   btn.addEventListener("click", apri);
-  btnPrec.addEventListener("click", () => { lunedi = aggiungi(lunedi, -7); render(); });
-  btnSucc.addEventListener("click", () => { lunedi = aggiungi(lunedi, 7); render(); });
+  btnPrec.addEventListener("click", () => { lunedi = aggiungi(lunedi, -7); aperto = null; render(); });
+  btnSucc.addEventListener("click", () => { lunedi = aggiungi(lunedi, 7); aperto = null; render(); });
   btnChiudi.addEventListener("click", () => modal.close());
+  btnModifica.addEventListener("click", () => { modifica = !modifica; aperto = null; render(); });
+  btnCopia.addEventListener("click", async () => {
+    const testo = jsonDaPubblicare();
+    try{
+      await navigator.clipboard.writeText(testo);
+      barraTesto.innerHTML = "<b>JSON copiato.</b> Incollalo nel file su GitHub e fai Commit changes.";
+    }catch(_){
+      barraTesto.textContent = "Copia non riuscita: il browser ha bloccato gli appunti.";
+    }
+  });
+  btnScarta.addEventListener("click", () => {
+    piano = base.map(e => ({...e}));
+    aperto = null;
+    cancellaBozza();
+    render();
+  });
   modal.addEventListener("click", e => { if(e.target === modal) modal.close(); });
+  modal.addEventListener("close", () => { modifica = false; aperto = null; });
 })();
 </script>
 
