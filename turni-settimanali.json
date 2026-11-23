@@ -616,6 +616,11 @@
       "data": "2026-12-19",
       "fascia": "weekend",
       "operatore": "Francesco"
+    },
+    {
+      "data": "2026-12-20",
+      "fascia": "dom_mattina",
+      "operatore": "Aldo"
     }
   ],
   "festivi": [
