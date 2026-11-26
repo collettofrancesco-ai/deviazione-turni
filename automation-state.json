@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-26T12:16:04+01:00",
+  "updated_at": "2026-11-26T19:15:54+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -424,6 +424,14 @@
       "campo": "POMERIGGIO",
       "status": "verificata",
       "inviato_il": "2026-11-26T12:16:03+01:00"
+    },
+    "2026-11-26|notte": {
+      "data": "2026-11-26",
+      "fascia": "notte",
+      "operatore": "Roberta",
+      "campo": "NOTTE",
+      "status": "verificata",
+      "inviato_il": "2026-11-26T19:15:53+01:00"
     }
   }
 }
