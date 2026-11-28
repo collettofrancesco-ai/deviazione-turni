@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-28T05:16:14+01:00",
+  "updated_at": "2026-11-28T11:16:22+01:00",
   "events": {
     "2026-11-09|mattina": {
       "data": "2026-11-09",
@@ -464,6 +464,14 @@
       "campo": "WE_MATTINA",
       "status": "verificata",
       "inviato_il": "2026-11-28T05:16:11+01:00"
+    },
+    "2026-11-28|we_pom": {
+      "data": "2026-11-28",
+      "fascia": "we_pom",
+      "operatore": "Ignazio",
+      "campo": "WE_POMERIGGIO",
+      "status": "verificata",
+      "inviato_il": "2026-11-28T11:16:20+01:00"
     }
   }
 }
